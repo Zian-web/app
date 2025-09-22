@@ -19,7 +19,8 @@ import {
   Eye,
   AlertTriangle,
   Upload,
-  Download
+  Download,
+  Edit
 } from 'lucide-react';
 import { 
   mockStudents, 
