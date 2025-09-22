@@ -157,26 +157,78 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
         </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-white">
+          {/* Mobile Tab Navigation */}
+          <div className="md:hidden">
+            <div className="flex overflow-x-auto space-x-1 p-2 bg-white rounded-lg border">
+              <Button
+                variant={activeTab === 'students' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('students')}
+                className="flex items-center space-x-2 whitespace-nowrap"
+              >
+                <Users className="w-4 h-4" />
+                <span>Students</span>
+              </Button>
+              <Button
+                variant={activeTab === 'materials' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('materials')}
+                className="flex items-center space-x-2 whitespace-nowrap"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Materials</span>
+              </Button>
+              <Button
+                variant={activeTab === 'attendance' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('attendance')}
+                className="flex items-center space-x-2 whitespace-nowrap"
+              >
+                <Calendar className="w-4 h-4" />
+                <span>Attendance</span>
+              </Button>
+              <Button
+                variant={activeTab === 'payments' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('payments')}
+                className="flex items-center space-x-2 whitespace-nowrap"
+              >
+                <CreditCard className="w-4 h-4" />
+                <span>Payments</span>
+              </Button>
+              <Button
+                variant={activeTab === 'notifications' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('notifications')}
+                className="flex items-center space-x-2 whitespace-nowrap"
+              >
+                <Bell className="w-4 h-4" />
+                <span>Notifications</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Desktop Tab Navigation */}
+          <TabsList className="hidden md:grid w-full grid-cols-5 bg-white">
             <TabsTrigger value="students" className="flex items-center space-x-2">
               <Users className="w-4 h-4" />
-              <span className="hidden sm:inline">Students</span>
+              <span>Students</span>
             </TabsTrigger>
             <TabsTrigger value="materials" className="flex items-center space-x-2">
               <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">Materials</span>
+              <span>Materials</span>
             </TabsTrigger>
             <TabsTrigger value="attendance" className="flex items-center space-x-2">
               <Calendar className="w-4 h-4" />
-              <span className="hidden sm:inline">Attendance</span>
+              <span>Attendance</span>
             </TabsTrigger>
             <TabsTrigger value="payments" className="flex items-center space-x-2">
               <CreditCard className="w-4 h-4" />
-              <span className="hidden sm:inline">Payments</span>
+              <span>Payments</span>
             </TabsTrigger>
             <TabsTrigger value="notifications" className="flex items-center space-x-2">
               <Bell className="w-4 h-4" />
-              <span className="hidden sm:inline">Notifications</span>
+              <span>Notifications</span>
             </TabsTrigger>
           </TabsList>
 
