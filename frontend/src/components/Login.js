@@ -1,24 +1,23 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { User, Lock, UserCheck } from 'lucide-react';
+import { User, Lock } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 
 const Login = () => {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState('');
+  const [selectedRole, setSelectedRole] = useState('teacher');
   const { login } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    if (!id || !password || !selectedRole) {
+    if (!id || !password) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -39,81 +38,109 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-xl border-0 bg-white/95 backdrop-blur">
-        <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mb-4">
-            <UserCheck className="w-6 h-6 text-white" />
-          </div>
-          <CardTitle className="text-2xl font-bold text-slate-900">Welcome Back</CardTitle>
-          <CardDescription className="text-slate-600">
-            Sign in to your Teacher-Student Management System
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="role" className="text-sm font-medium text-slate-700">Select Role</Label>
-              <Select value={selectedRole} onValueChange={setSelectedRole}>
-                <SelectTrigger className="h-11">
-                  <SelectValue placeholder="Choose your role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="teacher">Teacher</SelectItem>
-                  <SelectItem value="student">Student</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Teacher-Student
+          </h1>
+          <h1 className="text-4xl font-bold text-blue-600 mb-6">
+            Management System
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Select your role and login to access your dashboard
+          </p>
+        </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="id" className="text-sm font-medium text-slate-700">
-                {selectedRole === 'teacher' ? 'Teacher ID' : 'Student ID'}
-              </Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <Input
-                  id="id"
-                  type="text"
-                  value={id}
-                  onChange={(e) => setId(e.target.value)}
-                  className="pl-10 h-11"
-                  placeholder={selectedRole === 'teacher' ? 'Enter Teacher ID' : 'Enter Student ID'}
-                />
+        <Card className="shadow-lg border-gray-200">
+          <CardContent className="p-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Role Selection */}
+              <div className="space-y-3">
+                <Label className="text-lg font-medium text-gray-700">Select Role</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    type="button"
+                    onClick={() => setSelectedRole('teacher')}
+                    className={`h-14 text-lg font-medium ${
+                      selectedRole === 'teacher'
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300'
+                    }`}
+                    variant={selectedRole === 'teacher' ? 'default' : 'outline'}
+                  >
+                    Teacher
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => setSelectedRole('student')}
+                    className={`h-14 text-lg font-medium ${
+                      selectedRole === 'student'
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300'
+                    }`}
+                    variant={selectedRole === 'student' ? 'default' : 'outline'}
+                  >
+                    Student
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-slate-700">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 h-11"
-                  placeholder="Enter your password"
-                />
+              {/* ID Field */}
+              <div className="space-y-2">
+                <Label htmlFor="id" className="text-lg font-medium text-gray-700">
+                  {selectedRole === 'teacher' ? 'Teacher ID' : 'Student ID'}
+                </Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Input
+                    id="id"
+                    type="text"
+                    value={id}
+                    onChange={(e) => setId(e.target.value)}
+                    className="pl-12 h-12 text-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder={selectedRole === 'teacher' ? 'Enter Teacher ID' : 'Enter Student ID'}
+                  />
+                </div>
               </div>
-            </div>
 
-            <Button 
-              type="submit" 
-              className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white font-medium transition-all duration-200"
-            >
-              Sign In
-            </Button>
-          </form>
+              {/* Password Field */}
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-lg font-medium text-gray-700">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-12 h-12 text-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Enter Password"
+                  />
+                </div>
+              </div>
 
-          <div className="mt-6 p-4 bg-slate-50 rounded-lg border">
-            <p className="text-xs font-medium text-slate-700 mb-2">Demo Credentials:</p>
-            <div className="text-xs text-slate-600 space-y-1">
-              <div><strong>Teacher:</strong> T001 / teacher123</div>
-              <div><strong>Student:</strong> S001 / student123</div>
-            </div>
+              {/* Login Button */}
+              <Button 
+                type="submit" 
+                className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium rounded-lg transition-all duration-200"
+              >
+                Login
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Sample Credentials */}
+        <div className="mt-8 text-center">
+          <p className="text-gray-600 text-lg font-medium mb-3">Sample Credentials:</p>
+          <div className="bg-gray-100 rounded-lg p-4 space-y-2">
+            <p className="text-blue-600 font-medium text-lg">Use Teacher1 / password</p>
+            <p className="text-blue-600 font-medium text-lg">Use Student1 / password</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };
