@@ -110,6 +110,23 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
     });
   };
 
+  const handleUpdatePayment = (payment) => {
+    setSelectedPayment(payment);
+    setShowUpdatePayment(true);
+  };
+
+  const handlePaymentStatusUpdate = (status) => {
+    if (selectedPayment) {
+      toast({
+        title: "Payment Updated",
+        description: `Payment status updated to ${status} for ${getStudentName(selectedPayment.studentId)} (Demo)`,
+        variant: "default"
+      });
+      setShowUpdatePayment(false);
+      setSelectedPayment(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
