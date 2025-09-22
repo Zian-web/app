@@ -121,18 +121,52 @@ const StudentBatchView = ({ batch, onBack, currentUser }) => {
         </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-white">
+          {/* Mobile Tab Navigation */}
+          <div className="md:hidden">
+            <div className="flex overflow-x-auto space-x-1 p-2 bg-white rounded-lg border">
+              <Button
+                variant={activeTab === 'materials' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('materials')}
+                className="flex items-center space-x-2 whitespace-nowrap"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Materials</span>
+              </Button>
+              <Button
+                variant={activeTab === 'attendance' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('attendance')}
+                className="flex items-center space-x-2 whitespace-nowrap"
+              >
+                <Calendar className="w-4 h-4" />
+                <span>Attendance</span>
+              </Button>
+              <Button
+                variant={activeTab === 'payments' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('payments')}
+                className="flex items-center space-x-2 whitespace-nowrap"
+              >
+                <CreditCard className="w-4 h-4" />
+                <span>Payments</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Desktop Tab Navigation */}
+          <TabsList className="hidden md:grid w-full grid-cols-3 bg-white">
             <TabsTrigger value="materials" className="flex items-center space-x-2">
               <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">Materials</span>
+              <span>Materials</span>
             </TabsTrigger>
             <TabsTrigger value="attendance" className="flex items-center space-x-2">
               <Calendar className="w-4 h-4" />
-              <span className="hidden sm:inline">Attendance</span>
+              <span>Attendance</span>
             </TabsTrigger>
             <TabsTrigger value="payments" className="flex items-center space-x-2">
               <CreditCard className="w-4 h-4" />
-              <span className="hidden sm:inline">Payments</span>
+              <span>Payments</span>
             </TabsTrigger>
           </TabsList>
 
