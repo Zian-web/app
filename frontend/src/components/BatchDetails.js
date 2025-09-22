@@ -35,6 +35,8 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
   const [activeTab, setActiveTab] = useState('students');
   const [newMaterial, setNewMaterial] = useState({ title: '', type: 'PDF' });
   const [showAddMaterial, setShowAddMaterial] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [showUpdatePayment, setShowUpdatePayment] = useState(false);
   const { toast } = useToast();
 
   // Get batch-specific data
