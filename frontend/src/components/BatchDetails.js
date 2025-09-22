@@ -426,7 +426,58 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
 
           {/* Payments Tab */}
           <TabsContent value="payments" className="space-y-6">
-            <h2 className="text-2xl font-bold">Payment Records</h2>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <h2 className="text-2xl font-bold">Payment Records</h2>
+              {userRole === 'teacher' && (
+                <div className="text-sm text-slate-600 bg-blue-50 p-3 rounded-lg border border-blue-200">
+                  <p className="font-medium text-blue-800">💡 Teacher Tip:</p>
+                  <p>Click "Update" on any payment to mark offline cash payments as paid</p>
+                </div>
+              )}
+            </div>
+
+            {/* Payment Update Modal */}
+            {showUpdatePayment && selectedPayment && userRole === 'teacher' && (
+              <Card className="border-2 border-blue-200 bg-blue-50">
+                <CardHeader>
+                  <CardTitle>Update Payment Status</CardTitle>
+                  <CardDescription>
+                    Student: {getStudentName(selectedPayment.studentId)} | Amount: ${selectedPayment.amount}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    <Button 
+                      onClick={() => handlePaymentStatusUpdate('paid')}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      Mark as Paid (Cash)
+                    </Button>
+                    <Button 
+                      onClick={() => handlePaymentStatusUpdate('pending')}
+                      variant="outline"
+                      className="border-yellow-600 text-yellow-600 hover:bg-yellow-50"
+                    >
+                      Keep Pending
+                    </Button>
+                    <Button 
+                      onClick={() => handlePaymentStatusUpdate('overdue')}
+                      variant="outline"
+                      className="border-red-600 text-red-600 hover:bg-red-50"
+                    >
+                      Mark Overdue
+                    </Button>
+                    <Button 
+                      onClick={() => setShowUpdatePayment(false)}
+                      variant="outline"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             <Card>
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
@@ -438,12 +489,13 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
                         <TableHead>Due Date</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Paid Date</TableHead>
+                        {userRole === 'teacher' && <TableHead>Actions</TableHead>}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {batchPayments.map(payment => (
                         <TableRow key={payment.id}>
-                          <TableCell>{getStudentName(payment.studentId)}</TableCell>
+                          <TableCell className="font-medium">{getStudentName(payment.studentId)}</TableCell>
                           <TableCell>${payment.amount}</TableCell>
                           <TableCell>{payment.dueDate}</TableCell>
                           <TableCell>
@@ -452,6 +504,18 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
                             </Badge>
                           </TableCell>
                           <TableCell>{payment.paidDate || 'N/A'}</TableCell>
+                          {userRole === 'teacher' && (
+                            <TableCell>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleUpdatePayment(payment)}
+                                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                              >
+                                Update
+                              </Button>
+                            </TableCell>
+                          )}
                         </TableRow>
                       ))}
                     </TableBody>
