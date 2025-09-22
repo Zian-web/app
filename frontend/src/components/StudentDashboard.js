@@ -3,18 +3,16 @@ import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import ResponsiveLayout from './ResponsiveLayout';
+import StudentBatchView from './StudentBatchView';
 import { 
   BookOpen, 
   FileText, 
   CreditCard, 
-  Bell, 
-  LogOut,
-  Eye,
-  User,
   Calendar,
-  Download
+  User,
+  Eye
 } from 'lucide-react';
 import { 
   mockBatches, 
@@ -28,6 +26,7 @@ import {
 const StudentDashboard = () => {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [selectedBatch, setSelectedBatch] = useState(null);
 
   // Get student's enrolled batches
   const studentBatches = mockBatches.filter(batch => 
@@ -55,6 +54,15 @@ const StudentDashboard = () => {
     payment.studentId === user.id
   );
 
+  const tabs = [
+    { value: 'dashboard', label: 'Dashboard', icon: <BookOpen className="w-4 h-4" /> },
+    { value: 'batches', label: 'My Batches', icon: <BookOpen className="w-4 h-4" /> },
+    { value: 'materials', label: 'Materials', icon: <FileText className="w-4 h-4" /> },
+    { value: 'attendance', label: 'Attendance', icon: <Calendar className="w-4 h-4" /> },
+    { value: 'payments', label: 'Payments', icon: <CreditCard className="w-4 h-4" /> },
+    { value: 'profile', label: 'Profile', icon: <User className="w-4 h-4" /> }
+  ];
+
   const getBatchName = (batchId) => {
     const batch = mockBatches.find(b => b.id === batchId);
     return batch ? batch.name : 'Unknown';
@@ -74,181 +82,161 @@ const StudentDashboard = () => {
     }
   };
 
+  if (selectedBatch) {
+    return (
+      <StudentBatchView 
+        batch={selectedBatch}
+        onBack={() => setSelectedBatch(null)}
+        currentUser={user}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 px-6 py-4">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900">Student Portal</h1>
-              <p className="text-sm text-slate-600">Welcome, {user.name}</p>
-            </div>
+    <ResponsiveLayout
+      tabs={tabs}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      onLogout={logout}
+      userName={user.name}
+      userRole="student"
+    >
+      {/* Dashboard Overview */}
+      {activeTab === 'dashboard' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Enrolled Batches</CardTitle>
+                <BookOpen className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{studentBatches.length}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Study Materials</CardTitle>
+                <FileText className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{studentMaterials.length}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Attendance Rate</CardTitle>
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {studentAttendance.length > 0 
+                    ? Math.round((studentAttendance.filter(a => a.status === 'present').length / studentAttendance.length) * 100)
+                    : 0}%
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pending Payments</CardTitle>
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {studentPayments.filter(p => p.status === 'pending' || p.status === 'overdue').length}
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          <Button 
-            onClick={logout}
-            variant="outline" 
-            className="flex items-center space-x-2"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Logout</span>
-          </Button>
-        </div>
-      </header>
 
-      <div className="max-w-7xl mx-auto p-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-white">
-            <TabsTrigger value="dashboard" className="flex items-center space-x-2">
-              <BookOpen className="w-4 h-4" />
-              <span>Dashboard</span>
-            </TabsTrigger>
-            <TabsTrigger value="batches" className="flex items-center space-x-2">
-              <BookOpen className="w-4 h-4" />
-              <span>My Batches</span>
-            </TabsTrigger>
-            <TabsTrigger value="materials" className="flex items-center space-x-2">
-              <FileText className="w-4 h-4" />
-              <span>Materials</span>
-            </TabsTrigger>
-            <TabsTrigger value="attendance" className="flex items-center space-x-2">
-              <Calendar className="w-4 h-4" />
-              <span>Attendance</span>
-            </TabsTrigger>
-            <TabsTrigger value="payments" className="flex items-center space-x-2">
-              <CreditCard className="w-4 h-4" />
-              <span>Payments</span>
-            </TabsTrigger>
-            <TabsTrigger value="profile" className="flex items-center space-x-2">
-              <User className="w-4 h-4" />
-              <span>Profile</span>
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Dashboard Overview */}
-          <TabsContent value="dashboard" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Enrolled Batches</CardTitle>
-                  <BookOpen className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{studentBatches.length}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Study Materials</CardTitle>
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{studentMaterials.length}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Attendance Rate</CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {studentAttendance.length > 0 
-                      ? Math.round((studentAttendance.filter(a => a.status === 'present').length / studentAttendance.length) * 100)
-                      : 0}%
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Pending Payments</CardTitle>
-                  <CreditCard className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {studentPayments.filter(p => p.status === 'pending' || p.status === 'overdue').length}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>My Batches</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {studentBatches.slice(0, 3).map(batch => (
-                      <div key={batch.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                        <div>
-                          <p className="font-medium">{batch.name}</p>
-                          <p className="text-sm text-slate-600">{getTeacherName(batch.teacherId)}</p>
-                          <p className="text-sm text-slate-600">{batch.schedule}</p>
-                        </div>
+          {/* Recent Activity */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>My Batches</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {studentBatches.slice(0, 3).map(batch => (
+                    <div key={batch.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                      <div className="flex-1">
+                        <p className="font-medium">{batch.name}</p>
+                        <p className="text-sm text-slate-600">{getTeacherName(batch.teacherId)}</p>
+                        <p className="text-sm text-slate-600">{batch.schedule}</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
                         <Badge variant="secondary">{batch.subject}</Badge>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent Notifications</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {studentNotifications.slice(0, 3).map(notification => (
-                      <div key={notification.id} className="p-3 bg-slate-50 rounded-lg">
-                        <p className="font-medium">{notification.title}</p>
-                        <p className="text-sm text-slate-600">{notification.message}</p>
-                        <p className="text-xs text-slate-500 mt-1">{getBatchName(notification.batchId)} • {notification.date}</p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Batches Tab */}
-          <TabsContent value="batches" className="space-y-6">
-            <h2 className="text-2xl font-bold">My Enrolled Batches</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {studentBatches.map(batch => (
-                <Card key={batch.id}>
-                  <CardHeader>
-                    <CardTitle>{batch.name}</CardTitle>
-                    <CardDescription>{batch.subject}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <p className="text-sm"><strong>Teacher:</strong> {getTeacherName(batch.teacherId)}</p>
-                      <p className="text-sm"><strong>Schedule:</strong> {batch.schedule}</p>
-                      <p className="text-sm"><strong>Duration:</strong> {batch.startDate} to {batch.endDate}</p>
-                      <div className="pt-2">
-                        <Button size="sm" className="w-full">
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Details
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => setSelectedBatch(batch)}
+                        >
+                          <Eye className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Materials Tab */}
-          <TabsContent value="materials" className="space-y-6">
-            <h2 className="text-2xl font-bold">Study Materials</h2>
             <Card>
-              <CardContent className="p-0">
+              <CardHeader>
+                <CardTitle>Recent Notifications</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {studentNotifications.slice(0, 3).map(notification => (
+                    <div key={notification.id} className="p-3 bg-slate-50 rounded-lg">
+                      <p className="font-medium">{notification.title}</p>
+                      <p className="text-sm text-slate-600">{notification.message}</p>
+                      <p className="text-xs text-slate-500 mt-1">{getBatchName(notification.batchId)} • {notification.date}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Batches Tab */}
+      {activeTab === 'batches' && (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold">My Enrolled Batches</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {studentBatches.map(batch => (
+              <Card key={batch.id} className="cursor-pointer hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle>{batch.name}</CardTitle>
+                  <CardDescription>{batch.subject}</CardDescription>
+                </CardHeader>
+                <CardContent onClick={() => setSelectedBatch(batch)}>
+                  <div className="space-y-2">
+                    <p className="text-sm"><strong>Teacher:</strong> {getTeacherName(batch.teacherId)}</p>
+                    <p className="text-sm"><strong>Schedule:</strong> {batch.schedule}</p>
+                    <p className="text-sm"><strong>Duration:</strong> {batch.startDate} to {batch.endDate}</p>
+                    <div className="pt-2">
+                      <Button size="sm" className="w-full">
+                        <Eye className="w-4 h-4 mr-2" />
+                        View Details
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Materials Tab */}
+      {activeTab === 'materials' && (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold">Study Materials</h2>
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -278,15 +266,19 @@ const StudentDashboard = () => {
                     ))}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
-          {/* Attendance Tab */}
-          <TabsContent value="attendance" className="space-y-6">
-            <h2 className="text-2xl font-bold">My Attendance</h2>
-            <Card>
-              <CardContent className="p-0">
+      {/* Attendance Tab */}
+      {activeTab === 'attendance' && (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold">My Attendance</h2>
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -309,15 +301,19 @@ const StudentDashboard = () => {
                     ))}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
-          {/* Payments Tab */}
-          <TabsContent value="payments" className="space-y-6">
-            <h2 className="text-2xl font-bold">Payment History</h2>
-            <Card>
-              <CardContent className="p-0">
+      {/* Payments Tab */}
+      {activeTab === 'payments' && (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold">Payment History</h2>
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -344,72 +340,70 @@ const StudentDashboard = () => {
                     ))}
                   </TableBody>
                 </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Profile Tab */}
+      {activeTab === 'profile' && (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold">My Profile</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Personal Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Student ID</label>
+                  <p className="text-slate-900">{user.id}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Full Name</label>
+                  <p className="text-slate-900">{user.name}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Email</label>
+                  <p className="text-slate-900">{user.email}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Phone</label>
+                  <p className="text-slate-900">{user.phone}</p>
+                </div>
               </CardContent>
             </Card>
-          </TabsContent>
 
-          {/* Profile Tab */}
-          <TabsContent value="profile" className="space-y-6">
-            <h2 className="text-2xl font-bold">My Profile</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Personal Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label className="text-sm font-medium text-slate-700">Student ID</Label>
-                    <p className="text-slate-900">{user.id}</p>
+            <Card>
+              <CardHeader>
+                <CardTitle>Academic Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Enrolled Batches</label>
+                  <div className="mt-2 space-y-2">
+                    {studentBatches.map(batch => (
+                      <div key={batch.id} className="flex items-center justify-between p-2 bg-slate-50 rounded">
+                        <span className="text-sm">{batch.name}</span>
+                        <Badge variant="secondary" className="text-xs">{batch.subject}</Badge>
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <Label className="text-sm font-medium text-slate-700">Full Name</Label>
-                    <p className="text-slate-900">{user.name}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-slate-700">Email</Label>
-                    <p className="text-slate-900">{user.email}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-slate-700">Phone</Label>
-                    <p className="text-slate-900">{user.phone}</p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Academic Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label className="text-sm font-medium text-slate-700">Enrolled Batches</Label>
-                    <div className="mt-2 space-y-2">
-                      {studentBatches.map(batch => (
-                        <div key={batch.id} className="flex items-center justify-between p-2 bg-slate-50 rounded">
-                          <span className="text-sm">{batch.name}</span>
-                          <Badge variant="secondary" className="text-xs">{batch.subject}</Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-slate-700">Overall Payment Status</Label>
-                    <Badge className={`mt-1 ${getPaymentStatusColor(user.paymentStatus)}`}>
-                      {user.paymentStatus}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Overall Payment Status</label>
+                  <Badge className={`mt-1 ${getPaymentStatusColor(user.paymentStatus)}`}>
+                    {user.paymentStatus}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+    </ResponsiveLayout>
   );
 };
-
-const Label = ({ className, children, ...props }) => (
-  <label className={className} {...props}>{children}</label>
-);
 
 export default StudentDashboard;
