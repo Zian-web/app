@@ -21,7 +21,7 @@ import {
   mockAttendance, 
   mockPayments,
   mockTeachers
-} from '../mock';
+} from '../data';
 import { useToast } from '../hooks/use-toast';
 
 const StudentBatchView = ({ batch, onBack, currentUser }) => {

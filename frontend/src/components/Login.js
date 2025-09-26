@@ -136,8 +136,8 @@ const Login = () => {
         <div className="mt-8 text-center">
           <p className="text-gray-600 text-lg font-medium mb-3">Sample Credentials:</p>
           <div className="bg-gray-100 rounded-lg p-4 space-y-2">
-            <p className="text-blue-600 font-medium text-lg">Use Teacher1 / password</p>
-            <p className="text-blue-600 font-medium text-lg">Use Student1 / password</p>
+            <p className="text-blue-600 font-medium text-lg">Use Teacher ID:- T001 / password</p>
+            <p className="text-blue-600 font-medium text-lg">Use Student ID:- S001 / password</p>
           </div>
         </div>
       </div>

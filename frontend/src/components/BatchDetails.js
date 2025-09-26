@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import AddStudentDialog from './AddStudentDialog';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -29,21 +30,56 @@ import {
   mockNotifications, 
   mockPayments,
   mockTeachers
-} from '../mock';
+} from '../data';
 import { useToast } from '../hooks/use-toast';
+import { theme } from '../lib/theme';
+
+const getPaymentStatusBadgeType = (status) => {
+  if (!status) return 'warning';
+  switch (status.toLowerCase()) {
+    case 'paid':
+      return 'success';
+    case 'pending':
+      return 'warning';
+    case 'overdue':
+      return 'error';
+    default:
+      return 'warning';
+  }
+};
 
 const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
+  // Custom styles based on theme
+  const styles = {
+    header: "bg-primary text-white shadow-md",
+    card: "bg-white border border-neutral-border rounded-lg shadow-sm",
+    button: {
+      primary: "bg-primary text-white hover:bg-primary-hover",
+      secondary: "bg-secondary text-white hover:bg-secondary-hover",
+      outline: "border border-neutral-border bg-white text-neutral-dark hover:bg-neutral-bg"
+    },
+    badge: {
+      success: "bg-success-light text-success",
+      warning: "bg-warning-light text-warning",
+      error: "bg-error-light text-error"
+    }
+  };
   const [activeTab, setActiveTab] = useState('students');
   const [newMaterial, setNewMaterial] = useState({ title: '', type: 'PDF' });
   const [showAddMaterial, setShowAddMaterial] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [showUpdatePayment, setShowUpdatePayment] = useState(false);
+  const [showAddStudent, setShowAddStudent] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState('');
   const { toast } = useToast();
 
   // Get batch-specific data
-  const batchStudents = mockStudents.filter(student => 
-    student.enrolledBatches.includes(batch.id)
-  );
+  const batchStudents = mockStudents
+    .filter(student => student.enrolledBatches.includes(batch.id))
+    .map(student => ({
+      ...student,
+      paymentStatus: student.paymentStatus || 'pending'  // Provide default status
+    }));
   const batchMaterials = mockMaterials.filter(material => 
     material.batchId === batch.id
   );
@@ -69,11 +105,31 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
 
   const getPaymentStatusColor = (status) => {
     switch (status) {
-      case 'paid': return 'bg-green-100 text-green-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'overdue': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'paid': return 'bg-success-light text-success';
+      case 'pending': return 'bg-warning-light text-warning';
+      case 'overdue': return 'bg-error-light text-error';
+      default: return 'bg-neutral-bg text-neutral-dark';
     }
+  };
+
+  const handleAddStudent = () => {
+    if (!selectedStudent) {
+      toast({
+        title: "Error",
+        description: "Please select a student",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // In a real app, this would make an API call
+    toast({
+      title: "Success",
+      description: "Student added to batch successfully",
+      variant: "default"
+    });
+    setSelectedStudent('');
+    setShowAddStudent(false);
   };
 
   const handleAddMaterial = () => {
@@ -129,39 +185,44 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-neutral-bg">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-50">
+      <header className={`${styles.header} px-4 py-4 sticky top-0 z-50`}>
         <div className="flex items-center space-x-4 max-w-7xl mx-auto">
           <Button 
+            className={`${styles.button.outline} !bg-white/10 !text-white flex items-center space-x-2`}
             onClick={onBack}
             variant="outline" 
             size="sm"
-            className="flex items-center space-x-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">Back</span>
           </Button>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-slate-900">{batch.name}</h1>
-            <p className="text-sm text-slate-600">{batch.subject} • {getTeacherName(batch.teacherId)}</p>
+          <div className="flex-1 flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-white">{batch.name}</h1>
+              <p className="text-sm text-white/80">{batch.subject} • {getTeacherName(batch.teacherId)}</p>
+            </div>
+            {userRole === 'teacher' && (
+              <AddStudentDialog batch={batch} onAddStudent={handleAddStudent} />
+            )}
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto p-4">
         {/* Batch Info Card */}
-        <Card className="mb-6">
+        <Card className={`${styles.card} mb-6`}>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              {batch.name}
-              <Badge variant="secondary">{batch.subject}</Badge>
+              <span className="text-neutral-dark">{batch.name}</span>
+              <Badge className={styles.badge.success}>{batch.subject}</Badge>
             </CardTitle>
             <CardDescription>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 <div>
-                  <p className="font-medium">Schedule</p>
-                  <p className="text-sm">{batch.schedule}</p>
+                  <p className="font-medium text-neutral-dark">Schedule</p>
+                  <p className="text-sm text-neutral">{batch.schedule}</p>
                 </div>
                 <div>
                   <p className="font-medium">Duration</p>
@@ -229,24 +290,24 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
           </div>
 
           {/* Desktop Tab Navigation */}
-          <TabsList className="hidden md:grid w-full grid-cols-5 bg-white">
-            <TabsTrigger value="students" className="flex items-center space-x-2">
+          <TabsList className={`${styles.card} hidden md:grid w-full grid-cols-5`}>
+            <TabsTrigger value="students" className="flex items-center space-x-2 data-[state=active]:bg-primary data-[state=active]:text-white">
               <Users className="w-4 h-4" />
               <span>Students</span>
             </TabsTrigger>
-            <TabsTrigger value="materials" className="flex items-center space-x-2">
+            <TabsTrigger value="materials" className="flex items-center space-x-2 data-[state=active]:bg-primary data-[state=active]:text-white">
               <FileText className="w-4 h-4" />
               <span>Materials</span>
             </TabsTrigger>
-            <TabsTrigger value="attendance" className="flex items-center space-x-2">
+            <TabsTrigger value="attendance" className="flex items-center space-x-2 data-[state=active]:bg-primary data-[state=active]:text-white">
               <Calendar className="w-4 h-4" />
               <span>Attendance</span>
             </TabsTrigger>
-            <TabsTrigger value="payments" className="flex items-center space-x-2">
+            <TabsTrigger value="payments" className="flex items-center space-x-2 data-[state=active]:bg-primary data-[state=active]:text-white">
               <CreditCard className="w-4 h-4" />
               <span>Payments</span>
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center space-x-2">
+            <TabsTrigger value="notifications" className="flex items-center space-x-2 data-[state=active]:bg-primary data-[state=active]:text-white">
               <Bell className="w-4 h-4" />
               <span>Notifications</span>
             </TabsTrigger>
@@ -260,28 +321,27 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
                 const hasUnpaidFees = studentPayments.some(p => p.status === 'pending' || p.status === 'overdue');
                 
                 return (
-                  <Card key={student.id}>
+                  <Card key={student.id} className={styles.card}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h3 className="font-medium">{student.name}</h3>
-                          <p className="text-sm text-slate-600">{student.email}</p>
-                          <p className="text-sm text-slate-600">{student.phone}</p>
+                          <h3 className="font-medium text-neutral-dark">{student.name}</h3>
+                          <p className="text-sm text-neutral">{student.email}</p>
+                          <p className="text-sm text-neutral">{student.phone}</p>
                         </div>
                         <div className="flex items-center space-x-2">
                           {hasUnpaidFees && userRole === 'teacher' && (
                             <Button
                               size="sm"
-                              variant="outline"
+                              className={`${styles.button.outline} !text-warning !border-warning hover:!bg-warning/10`}
                               onClick={() => sendFeeNotification(student.id)}
-                              className="text-orange-600 border-orange-600 hover:bg-orange-50"
                             >
                               <AlertTriangle className="w-4 h-4 mr-1" />
                               <span className="hidden sm:inline">Fee Alert</span>
                             </Button>
                           )}
-                          <Badge className={getPaymentStatusColor(student.paymentStatus)}>
-                            {student.paymentStatus}
+                          <Badge className={styles.badge[getPaymentStatusBadgeType(student.paymentStatus)] || styles.badge.warning}>
+                            {student.paymentStatus || 'Pending'}
                           </Badge>
                         </div>
                       </div>

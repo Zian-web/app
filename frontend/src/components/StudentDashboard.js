@@ -21,7 +21,7 @@ import {
   mockNotifications, 
   mockPayments,
   mockTeachers
-} from '../mock';
+} from '../data';
 
 const StudentDashboard = () => {
   const { user, logout } = useAuth();
