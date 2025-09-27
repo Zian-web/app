@@ -3,10 +3,10 @@ import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Login from "./components/Login";
-import TeacherDashboard from "./components/TeacherDashboard";
-import StudentDashboard from "./components/StudentDashboard";
-import TeacherRegister from "./pages/TeacherRegister";
-import StudentRegister from "./pages/StudentRegister";
+import TeacherDashboard from "./components/teacher/TeacherDashboard";
+import StudentDashboard from "./components/student/StudentDashboard";
+import TeacherRegister from "./components/teacher/TeacherRegister";
+import StudentRegister from "./components/student/StudentRegister";
 import ForgotPassword from "./pages/ForgotPassword";
 import { Toaster } from "./components/ui/toaster";
 

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import ResponsiveLayout from './ResponsiveLayout';
+import { useAuth } from '../../contexts/AuthContext';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import ResponsiveLayout from '../ResponsiveLayout';
 import StudentBatchView from './StudentBatchView';
 import { 
   BookOpen, 
@@ -21,7 +21,7 @@ import {
   mockNotifications, 
   mockPayments,
   mockTeachers
-} from '../data';
+} from '../../data';
 
 const StudentDashboard = () => {
   const { user, logout } = useAuth();

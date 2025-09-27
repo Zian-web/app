@@ -4,7 +4,6 @@ import AddStudentDialog from './AddStudentDialog';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
@@ -15,13 +14,8 @@ import {
   Calendar, 
   CreditCard, 
   Bell, 
-  Plus,
-  Trash2,
-  Eye,
-  AlertTriangle,
-  Upload,
-  Download,
-  Edit
+  Plus, 
+  Upload
 } from 'lucide-react';
 import { 
   mockStudents, 
@@ -32,7 +26,12 @@ import {
   mockTeachers
 } from '../data';
 import { useToast } from '../hooks/use-toast';
-import { theme } from '../lib/theme';
+import BatchStudents from './BatchStudents';
+import BatchMaterials from './BatchMaterials';
+import BatchAttendance from './BatchAttendance';
+import BatchPayments from './BatchPayments';
+import BatchNotifications from './BatchNotifications';
+import AddPaymentDialog from './AddPaymentDialog';
 
 const getPaymentStatusBadgeType = (status) => {
   if (!status) return 'warning';
@@ -64,7 +63,7 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
       error: "bg-error-light text-error"
     }
   };
-  const [activeTab, setActiveTab] = useState('students');
+  const [activeTab, setActiveTab] = useState('students'); // Default to students tab
   const [newMaterial, setNewMaterial] = useState({ title: '', type: 'PDF' });
   const [showAddMaterial, setShowAddMaterial] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
@@ -72,6 +71,8 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState('');
   const { toast } = useToast();
+  const [paymentFilter, setPaymentFilter] = useState('all');
+  const [paymentSearch, setPaymentSearch] = useState('');
 
   // Get batch-specific data
   const batchStudents = mockStudents
@@ -184,6 +185,25 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
     }
   };
 
+  const handleAddPayment = (paymentData) => {
+    // In a real app, this would make an API call
+    toast({
+      title: "Success",
+      description: "Payment added successfully (Demo)",
+      variant: "default"
+    });
+    console.log("New Payment Data:", paymentData);
+  };
+
+  // Filter batch payments
+  const filteredBatchPayments = batchPayments.filter(payment => {
+    const matchesFilter = paymentFilter === 'all' || payment.status === paymentFilter;
+    const searchTerm = paymentSearch.toLowerCase();
+    const studentName = getStudentName(payment.studentId).toLowerCase();
+    const matchesSearch = !paymentSearch || studentName.includes(searchTerm);
+    return matchesFilter && matchesSearch;
+  });
+
   return (
     <div className="min-h-screen bg-neutral-bg">
       {/* Header */}
@@ -210,7 +230,7 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto p-4">
+      <div className="max-w-7xl mx-auto p-4" >
         {/* Batch Info Card */}
         <Card className={`${styles.card} mb-6`}>
           <CardHeader>
@@ -315,59 +335,24 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
 
           {/* Students Tab */}
           <TabsContent value="students" className="space-y-6">
-            <div className="grid gap-4">
-              {batchStudents.map(student => {
-                const studentPayments = batchPayments.filter(p => p.studentId === student.id);
-                const hasUnpaidFees = studentPayments.some(p => p.status === 'pending' || p.status === 'overdue');
-                
-                return (
-                  <Card key={student.id} className={styles.card}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <h3 className="font-medium text-neutral-dark">{student.name}</h3>
-                          <p className="text-sm text-neutral">{student.email}</p>
-                          <p className="text-sm text-neutral">{student.phone}</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          {hasUnpaidFees && userRole === 'teacher' && (
-                            <Button
-                              size="sm"
-                              className={`${styles.button.outline} !text-warning !border-warning hover:!bg-warning/10`}
-                              onClick={() => sendFeeNotification(student.id)}
-                            >
-                              <AlertTriangle className="w-4 h-4 mr-1" />
-                              <span className="hidden sm:inline">Fee Alert</span>
-                            </Button>
-                          )}
-                          <Badge className={styles.badge[getPaymentStatusBadgeType(student.paymentStatus)] || styles.badge.warning}>
-                            {student.paymentStatus || 'Pending'}
-                          </Badge>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+            <BatchStudents 
+              students={batchStudents}
+              payments={batchPayments}
+              userRole={userRole}
+              onSendFeeNotification={sendFeeNotification}
+              getPaymentStatusBadgeType={getPaymentStatusBadgeType}
+              styles={styles}
+            />
           </TabsContent>
 
           {/* Materials Tab */}
           <TabsContent value="materials" className="space-y-6">
-            {userRole === 'teacher' && (
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Study Materials</h2>
-                <Button 
-                  onClick={() => setShowAddMaterial(true)}
-                  className="flex items-center space-x-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Add Material</span>
-                </Button>
-              </div>
-            )}
-
-            {/* Add Material Form */}
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">Study Materials</h2>
+              {userRole === 'teacher' && (
+                <Button onClick={() => setShowAddMaterial(true)} className="flex items-center space-x-2"><Plus className="w-4 h-4" /><span>Add Material</span></Button>
+              )}
+            </div>
             {showAddMaterial && userRole === 'teacher' && (
               <Card>
                 <CardHeader>
@@ -410,94 +395,33 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
               </Card>
             )}
 
-            <div className="grid gap-4">
-              {batchMaterials.map(material => (
-                <Card key={material.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-medium">{material.title}</h3>
-                        <div className="flex items-center space-x-2 mt-1">
-                          <Badge variant="outline">{material.type}</Badge>
-                          <span className="text-sm text-slate-600">{material.uploadDate}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Button size="sm" variant="outline">
-                          <Eye className="w-4 h-4" />
-                          <span className="hidden sm:inline ml-2">View</span>
-                        </Button>
-                        {userRole === 'student' && (
-                          <Button size="sm" variant="outline">
-                            <Download className="w-4 h-4" />
-                            <span className="hidden sm:inline ml-2">Download</span>
-                          </Button>
-                        )}
-                        {userRole === 'teacher' && (
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => handleDeleteMaterial(material.id)}
-                            className="text-red-600 border-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            <span className="hidden sm:inline ml-2">Delete</span>
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <BatchMaterials 
+              materials={batchMaterials}
+              userRole={userRole}
+              onDeleteMaterial={handleDeleteMaterial}
+            />
           </TabsContent>
 
           {/* Attendance Tab */}
           <TabsContent value="attendance" className="space-y-6">
             <h2 className="text-2xl font-bold">Attendance Records</h2>
-            <Card>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Student</TableHead>
-                        <TableHead>Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {batchAttendance.map(attendance => (
-                        <TableRow key={attendance.id}>
-                          <TableCell>{attendance.date}</TableCell>
-                          <TableCell>{getStudentName(attendance.studentId)}</TableCell>
-                          <TableCell>
-                            <Badge className={attendance.status === 'present' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                              {attendance.status}
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
+            <BatchAttendance attendance={batchAttendance} getStudentName={getStudentName} />
           </TabsContent>
 
           {/* Payments Tab */}
           <TabsContent value="payments" className="space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <h2 className="text-2xl font-bold">Payment Records</h2>
-              {userRole === 'teacher' && (
-                <div className="text-sm text-slate-600 bg-blue-50 p-3 rounded-lg border border-blue-200">
-                  <p className="font-medium text-blue-800">💡 Teacher Tip:</p>
-                  <p>Click "Update" on any payment to mark offline cash payments as paid</p>
-                </div>
-              )}
-            </div>
-
-            {/* Payment Update Modal */}
+            <AddPaymentDialog students={batchStudents} batches={[batch]} onAddPayment={handleAddPayment} />
+            <BatchPayments 
+              payments={filteredBatchPayments}
+              userRole={userRole}
+              getStudentName={getStudentName}
+              getPaymentStatusColor={getPaymentStatusColor}
+              onUpdatePayment={handleUpdatePayment}
+              paymentFilter={paymentFilter}
+              onFilterChange={setPaymentFilter}
+              paymentSearch={paymentSearch}
+              onSearchChange={(e) => setPaymentSearch(e.target.value)}
+            />
             {showUpdatePayment && selectedPayment && userRole === 'teacher' && (
               <Card className="border-2 border-blue-200 bg-blue-50">
                 <CardHeader>
@@ -538,81 +462,11 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
                 </CardContent>
               </Card>
             )}
-
-            <Card>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Student</TableHead>
-                        <TableHead>Amount</TableHead>
-                        <TableHead>Due Date</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Paid Date</TableHead>
-                        {userRole === 'teacher' && <TableHead>Actions</TableHead>}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {batchPayments.map(payment => (
-                        <TableRow key={payment.id}>
-                          <TableCell className="font-medium">{getStudentName(payment.studentId)}</TableCell>
-                          <TableCell>${payment.amount}</TableCell>
-                          <TableCell>{payment.dueDate}</TableCell>
-                          <TableCell>
-                            <Badge className={getPaymentStatusColor(payment.status)}>
-                              {payment.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{payment.paidDate || 'N/A'}</TableCell>
-                          {userRole === 'teacher' && (
-                            <TableCell>
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={() => handleUpdatePayment(payment)}
-                                className="text-blue-600 border-blue-600 hover:bg-blue-50"
-                              >
-                                Update
-                              </Button>
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
 
           {/* Notifications Tab */}
           <TabsContent value="notifications" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Notifications</h2>
-              {userRole === 'teacher' && (
-                <Button className="flex items-center space-x-2">
-                  <Plus className="w-4 h-4" />
-                  <span>New Notice</span>
-                </Button>
-              )}
-            </div>
-            <div className="space-y-4">
-              {batchNotifications.map(notification => (
-                <Card key={notification.id}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      {notification.title}
-                      <Badge variant="outline">{notification.type}</Badge>
-                    </CardTitle>
-                    <CardDescription>{notification.date}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p>{notification.message}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <BatchNotifications notifications={batchNotifications} userRole={userRole} />
           </TabsContent>
         </Tabs>
       </div>

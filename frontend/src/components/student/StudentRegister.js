@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { useToast } from '../hooks/use-toast';
-import { Textarea } from '../components/ui/textarea';
-import { Switch } from '../components/ui/switch';
+import { Card, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { useToast } from '../../hooks/use-toast';
 
-const TeacherRegister = () => {
+const StudentRegister = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
@@ -20,15 +18,12 @@ const TeacherRegister = () => {
     dateOfBirth: '',
     gender: '',
     fullAddress: '',
-    district: '',
-    state: '',
     pinCode: '',
-    subjects: '',
-    classes: '',
-    board: '',
-    university: '',
-    socialLinks: '',
-    requiresOnlinePayment: false
+    class: '',
+    year: '',
+    institutionName: '',
+    parentsName: '',
+    parentsPhone: ''
   });
 
   const handleChange = (e) => {
@@ -44,8 +39,7 @@ const TeacherRegister = () => {
     e.preventDefault();
     
     // Add validation here
-    if (!Object.values(formData).every(value => 
-      typeof value === 'boolean' ? true : value)) {
+    if (!Object.values(formData).every(value => value)) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -55,7 +49,7 @@ const TeacherRegister = () => {
     }
 
     try {
-      // Add API call here to register teacher
+      // Add API call here to register student
       toast({
         title: "Success",
         description: "Registration successful! Please wait for admin approval.",
@@ -74,7 +68,7 @@ const TeacherRegister = () => {
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Teacher Registration</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Student Registration</h1>
           <p className="text-gray-600 mt-2">Please fill in your details to create an account</p>
         </div>
 
@@ -165,28 +159,6 @@ const TeacherRegister = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="district">District *</Label>
-                  <Input
-                    id="district"
-                    name="district"
-                    value={formData.district}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="state">State *</Label>
-                  <Input
-                    id="state"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <Label htmlFor="pinCode">Pin Code *</Label>
                   <Input
                     id="pinCode"
@@ -198,76 +170,64 @@ const TeacherRegister = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="subjects">Subjects *</Label>
-                  <Input
-                    id="subjects"
-                    name="subjects"
-                    placeholder="e.g., Mathematics, Physics"
-                    value={formData.subjects}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="classes">Classes *</Label>
-                  <Input
-                    id="classes"
-                    name="classes"
-                    placeholder="e.g., Class 10, 11, 12"
-                    value={formData.classes}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="board">Board *</Label>
-                  <Select name="board" onValueChange={(value) => handleSelectChange('board', value)}>
+                  <Label htmlFor="class">Class *</Label>
+                  <Select name="class" onValueChange={(value) => handleSelectChange('class', value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select board" />
+                      <SelectValue placeholder="Select class" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="cbse">CBSE</SelectItem>
-                      <SelectItem value="icse">ICSE</SelectItem>
-                      <SelectItem value="state">State Board</SelectItem>
+                      {[...Array(12)].map((_, i) => (
+                        <SelectItem key={i + 1} value={String(i + 1)}>
+                          Class {i + 1}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="university">University *</Label>
+                  <Label htmlFor="year">Year *</Label>
                   <Input
-                    id="university"
-                    name="university"
-                    value={formData.university}
+                    id="year"
+                    name="year"
+                    value={formData.year}
                     onChange={handleChange}
                     required
                   />
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="socialLinks">Social Links</Label>
-                  <Textarea
-                    id="socialLinks"
-                    name="socialLinks"
-                    placeholder="Enter your social media links"
-                    value={formData.socialLinks}
+                <div className="space-y-2">
+                  <Label htmlFor="institutionName">Institution Name *</Label>
+                  <Input
+                    id="institutionName"
+                    name="institutionName"
+                    placeholder="School/College name"
+                    value={formData.institutionName}
                     onChange={handleChange}
+                    required
                   />
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="requiresOnlinePayment"
-                      checked={formData.requiresOnlinePayment}
-                      onCheckedChange={(checked) => 
-                        setFormData(prev => ({ ...prev, requiresOnlinePayment: checked }))
-                      }
-                    />
-                    <Label htmlFor="requiresOnlinePayment">Requires Online Payment</Label>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="parentsName">Parent's Name *</Label>
+                  <Input
+                    id="parentsName"
+                    name="parentsName"
+                    value={formData.parentsName}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="parentsPhone">Parent's Phone *</Label>
+                  <Input
+                    id="parentsPhone"
+                    name="parentsPhone"
+                    value={formData.parentsPhone}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
               </div>
 
@@ -291,4 +251,4 @@ const TeacherRegister = () => {
   );
 };
 
-export default TeacherRegister;
+export default StudentRegister;
