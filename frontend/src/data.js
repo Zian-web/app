@@ -49,14 +49,35 @@ export const mockNotifications = [{
   read: false
 }];
 
-export const mockPayments = [{
-  id: 'P001',
-  studentId: 'S001',
-  amount: 1000,
-  date: new Date().toISOString(),
-  status: 'paid',
-  batchId: 'B001'
-}];
+export const mockPayments = [
+  {
+    id: 'P001',
+    studentId: 'S001',
+    amount: 1000,
+    dueDate: '2025-09-15',
+    paidDate: '2025-09-10',
+    status: 'paid',
+    batchId: 'B001'
+  },
+  {
+    id: 'P002',
+    studentId: 'S001',
+    amount: 1000,
+    dueDate: '2025-10-15',
+    paidDate: null,
+    status: 'pending',
+    batchId: 'B001'
+  },
+  {
+    id: 'P003',
+    studentId: 'S001',
+    amount: 1000,
+    dueDate: '2025-08-15',
+    paidDate: null,
+    status: 'overdue',
+    batchId: 'B001'
+  }
+];
 
 export const mockAssignments = [{
   id: 'AS001',

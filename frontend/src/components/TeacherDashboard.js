@@ -19,6 +19,7 @@ import {
   Trash2,
   Eye
 } from 'lucide-react';
+import { useToast } from '../hooks/use-toast';
 import { 
   mockBatches, 
   mockStudents, 
@@ -32,45 +33,10 @@ const TeacherDashboard = () => {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedBatch, setSelectedBatch] = useState(null);
-
-  // Get teacher's batches
-  const teacherBatches = mockBatches.filter(batch => batch.teacherId === user.id);
-  const batchIds = teacherBatches.map(batch => batch.id);
-  
-  // Get students in teacher's batches
-  const teacherStudents = mockStudents.filter(student => 
-    student.enrolledBatches.some(batchId => batchIds.includes(batchId))
-  );
-
-  // Get materials for teacher's batches
-  const teacherMaterials = mockMaterials.filter(material => 
-    batchIds.includes(material.batchId)
-  );
-
-  // Get attendance for teacher's batches
-  const teacherAttendance = mockAttendance.filter(attendance => 
-    batchIds.includes(attendance.batchId)
-  );
-
-  // Get notifications for teacher's batches
-  const teacherNotifications = mockNotifications.filter(notification => 
-    batchIds.includes(notification.batchId)
-  );
-
-  // Get payments for teacher's students
-  const teacherPayments = mockPayments.filter(payment => 
-    batchIds.includes(payment.batchId)
-  );
-
-  const tabs = [
-    { value: 'dashboard', label: 'Dashboard', icon: <BookOpen className="w-4 h-4" /> },
-    { value: 'batches', label: 'Batches', icon: <Users className="w-4 h-4" /> },
-    { value: 'students', label: 'Students', icon: <Users className="w-4 h-4" /> },
-    { value: 'materials', label: 'Materials', icon: <FileText className="w-4 h-4" /> },
-    { value: 'attendance', label: 'Attendance', icon: <Calendar className="w-4 h-4" /> },
-    { value: 'payments', label: 'Payments', icon: <CreditCard className="w-4 h-4" /> },
-    { value: 'notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> }
-  ];
+  const [paymentFilter, setPaymentFilter] = useState('all'); // 'all', 'paid', 'pending'
+  const [paymentSearch, setPaymentSearch] = useState('');
+  const [materialSearch, setMaterialSearch] = useState('');
+  const { toast } = useToast();
 
   const getStudentName = (studentId) => {
     const student = mockStudents.find(s => s.id === studentId);
@@ -90,6 +56,90 @@ const TeacherDashboard = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // Get teacher's batches
+  const teacherBatches = mockBatches.filter(batch => batch.teacherId === user.id);
+  const batchIds = teacherBatches.map(batch => batch.id);
+  
+  // Get students in teacher's batches
+  const teacherStudents = mockStudents.filter(student => 
+    student.enrolledBatches.some(batchId => batchIds.includes(batchId))
+  );
+
+  // Get materials for teacher's batches
+  const teacherMaterials = mockMaterials.filter(material => 
+    batchIds.includes(material.batchId)
+  );
+
+  // Filter materials based on search
+  const filteredMaterials = teacherMaterials.filter(material => {
+    const searchTerm = materialSearch.toLowerCase();
+    return !materialSearch || 
+      material.title.toLowerCase().includes(searchTerm) || 
+      getBatchName(material.batchId).toLowerCase().includes(searchTerm) ||
+      material.type.toLowerCase().includes(searchTerm);
+  });
+
+  // Get attendance for teacher's batches
+  const teacherAttendance = mockAttendance.filter(attendance => 
+    batchIds.includes(attendance.batchId)
+  );
+
+  // Get notifications for teacher's batches
+  const teacherNotifications = mockNotifications.filter(notification => 
+    batchIds.includes(notification.batchId)
+  );
+
+  // Get payments for teacher's students
+  const teacherPayments = mockPayments.filter(payment => 
+    batchIds.includes(payment.batchId)
+  );
+
+  // Filter payments based on status and search
+  const filteredPayments = teacherPayments.filter(payment => {
+    const matchesFilter = paymentFilter === 'all' || payment.status === paymentFilter;
+    const searchTerm = paymentSearch.toLowerCase();
+    const studentName = getStudentName(payment.studentId).toLowerCase();
+    const batchName = getBatchName(payment.batchId).toLowerCase();
+    const matchesSearch = !paymentSearch || 
+      studentName.includes(searchTerm) || 
+      batchName.includes(searchTerm);
+    return matchesFilter && matchesSearch;
+  });
+
+  // Function to alert students with pending payments
+  const alertPendingPayments = () => {
+    const pendingPayments = teacherPayments.filter(payment => payment.status === 'pending');
+    const pendingStudents = pendingPayments.map(payment => getStudentName(payment.studentId));
+    
+    if (pendingStudents.length === 0) {
+      toast({
+        title: "No Pending Payments",
+        description: "All students are up to date with their payments.",
+        variant: "default"
+      });
+      return;
+    }
+
+    toast({
+      title: "Payment Reminders Sent",
+      description: `Payment reminders sent to ${pendingStudents.length} students.`,
+      variant: "default"
+    });
+
+    // Here you would typically call an API to send actual notifications
+    console.log("Payment reminders to be sent to:", pendingStudents);
+  };
+
+  const tabs = [
+    { value: 'dashboard', label: 'Dashboard', icon: <BookOpen className="w-4 h-4" /> },
+    { value: 'batches', label: 'Batches', icon: <Users className="w-4 h-4" /> },
+    { value: 'students', label: 'Students', icon: <Users className="w-4 h-4" /> },
+    { value: 'materials', label: 'Materials', icon: <FileText className="w-4 h-4" /> },
+    { value: 'attendance', label: 'Attendance', icon: <Calendar className="w-4 h-4" /> },
+    { value: 'payments', label: 'Payments', icon: <CreditCard className="w-4 h-4" /> },
+    { value: 'notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> }
+  ];
 
   if (selectedBatch) {
     return (
@@ -302,10 +352,19 @@ const TeacherDashboard = () => {
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <h2 className="text-2xl font-bold">Study Materials</h2>
-            <Button className="flex items-center space-x-2">
-              <Plus className="w-4 h-4" />
-              <span>Upload Material</span>
-            </Button>
+            <div className="flex items-center space-x-4">
+              <input
+                type="text"
+                placeholder="Search materials..."
+                value={materialSearch}
+                onChange={(e) => setMaterialSearch(e.target.value)}
+                className="px-3 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <Button className="flex items-center space-x-2">
+                <Plus className="w-4 h-4" />
+                <span>Upload Material</span>
+              </Button>
+            </div>
           </div>
           <Card>
             <CardContent className="p-0">
@@ -321,7 +380,7 @@ const TeacherDashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {teacherMaterials.map(material => (
+                    {filteredMaterials.map(material => (
                       <TableRow key={material.id}>
                         <TableCell className="font-medium">{material.title}</TableCell>
                         <TableCell>{getBatchName(material.batchId)}</TableCell>
@@ -392,7 +451,46 @@ const TeacherDashboard = () => {
       {/* Payments Tab */}
       {activeTab === 'payments' && (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold">Payment Status</h2>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <h2 className="text-2xl font-bold">Payment Status</h2>
+            <div className="flex items-center space-x-4">
+              <input
+                type="text"
+                placeholder="Search student or batch..."
+                value={paymentSearch}
+                onChange={(e) => setPaymentSearch(e.target.value)}
+                className="px-3 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <div className="flex space-x-2">
+                <Button 
+                  variant={paymentFilter === 'all' ? 'default' : 'outline'}
+                  onClick={() => setPaymentFilter('all')}
+                >
+                  All
+                </Button>
+                <Button 
+                  variant={paymentFilter === 'paid' ? 'default' : 'outline'}
+                  onClick={() => setPaymentFilter('paid')}
+                >
+                  Payment Done
+                </Button>
+                <Button 
+                  variant={paymentFilter === 'pending' ? 'default' : 'outline'}
+                  onClick={() => setPaymentFilter('pending')}
+                >
+                  Payment Due
+                </Button>
+              </div>
+              <Button
+                variant="secondary"
+                onClick={alertPendingPayments}
+                className="flex items-center space-x-2"
+              >
+                <Bell className="w-4 h-4" />
+                <span>Alert All Due</span>
+              </Button>
+            </div>
+          </div>
           <Card>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
@@ -408,7 +506,7 @@ const TeacherDashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {teacherPayments.map(payment => (
+                    {filteredPayments.map(payment => (
                       <TableRow key={payment.id}>
                         <TableCell>{getStudentName(payment.studentId)}</TableCell>
                         <TableCell>{getBatchName(payment.batchId)}</TableCell>

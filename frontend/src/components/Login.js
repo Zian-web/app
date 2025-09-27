@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
@@ -8,6 +9,7 @@ import { User, Lock } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 
 const Login = () => {
+  const navigate = useNavigate();
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [selectedRole, setSelectedRole] = useState('teacher');
@@ -99,7 +101,7 @@ const Login = () => {
                     type="text"
                     value={id}
                     onChange={(e) => setId(e.target.value)}
-                    className="pl-12 h-12 text-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    className="pl-10"
                     placeholder={selectedRole === 'teacher' ? 'Enter Teacher ID' : 'Enter Student ID'}
                   />
                 </div>
@@ -107,7 +109,9 @@ const Login = () => {
 
               {/* Password Field */}
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-lg font-medium text-gray-700">Password</Label>
+                <Label htmlFor="password" className="text-lg font-medium text-gray-700">
+                  Password
+                </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input
@@ -115,31 +119,49 @@ const Login = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-12 h-12 text-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="Enter Password"
+                    className="pl-10"
+                    placeholder="Enter your password"
                   />
                 </div>
               </div>
 
-              {/* Login Button */}
-              <Button 
-                type="submit" 
-                className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium rounded-lg transition-all duration-200"
-              >
+              {/* Submit Button */}
+              <Button type="submit" className="w-full h-12 text-lg">
                 Login
               </Button>
+
+              {/* Links */}
+              <div className="space-y-4 text-center">
+                <div>
+                  <Link
+                    to="/forgot-password"
+                    className="text-blue-600 hover:text-blue-700 text-sm"
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-gray-600">New to the platform?</p>
+                  <div className="space-x-4">
+                    <Link
+                      to="/register/teacher"
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      Register as Teacher
+                    </Link>
+                    <span className="text-gray-400">|</span>
+                    <Link
+                      to="/register/student"
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      Register as Student
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </form>
           </CardContent>
         </Card>
-
-        {/* Sample Credentials */}
-        <div className="mt-8 text-center">
-          <p className="text-gray-600 text-lg font-medium mb-3">Sample Credentials:</p>
-          <div className="bg-gray-100 rounded-lg p-4 space-y-2">
-            <p className="text-blue-600 font-medium text-lg">Use Teacher ID:- T001 / password</p>
-            <p className="text-blue-600 font-medium text-lg">Use Student ID:- S001 / password</p>
-          </div>
-        </div>
       </div>
     </div>
   );
