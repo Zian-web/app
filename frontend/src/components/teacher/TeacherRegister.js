@@ -28,7 +28,16 @@ const TeacherRegister = () => {
     board: '',
     university: '',
     socialLinks: '',
-    requiresOnlinePayment: false
+    requiresOnlinePayment: false,
+    bankAccountNumber: '',
+    ifscCode: '',
+    accountType: '',
+    bankName: '',
+    governmentId: '',
+    selfie: '',
+    permanentAddress: '',
+    correspondenceAddress: '',
+    taxId: ''
   });
 
   const handleChange = (e) => {
@@ -60,7 +69,7 @@ const TeacherRegister = () => {
         title: "Success",
         description: "Registration successful! Please wait for admin approval.",
       });
-      navigate('/login');
+      navigate('/login', { replace: true });
     } catch (error) {
       toast({
         title: "Error",
@@ -266,16 +275,165 @@ const TeacherRegister = () => {
                         setFormData(prev => ({ ...prev, requiresOnlinePayment: checked }))
                       }
                     />
-                    <Label htmlFor="requiresOnlinePayment">Requires Online Payment</Label>
+                    <Label htmlFor="requiresOnlinePayment">Enable Online Payment Service</Label>
                   </div>
                 </div>
+
+                {formData.requiresOnlinePayment && (
+                  <>
+                    {/* Bank Account Details */}
+                    <div className="md:col-span-2">
+                      <h3 className="text-lg font-semibold mb-4">Bank Account Details</h3>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="bankAccountNumber">Bank Account Number *</Label>
+                      <Input
+                        id="bankAccountNumber"
+                        name="bankAccountNumber"
+                        value={formData.bankAccountNumber}
+                        onChange={handleChange}
+                        required={formData.requiresOnlinePayment}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="ifscCode">IFSC Code *</Label>
+                      <Input
+                        id="ifscCode"
+                        name="ifscCode"
+                        value={formData.ifscCode}
+                        onChange={handleChange}
+                        required={formData.requiresOnlinePayment}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="accountType">Account Type *</Label>
+                      <Select name="accountType" onValueChange={(value) => handleSelectChange('accountType', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select account type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="savings">Savings</SelectItem>
+                          <SelectItem value="current">Current</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="bankName">Bank Name *</Label>
+                      <Input
+                        id="bankName"
+                        name="bankName"
+                        value={formData.bankName}
+                        onChange={handleChange}
+                        required={formData.requiresOnlinePayment}
+                      />
+                    </div>
+
+                    {/* Identity Verification */}
+                    <div className="md:col-span-2">
+                      <h3 className="text-lg font-semibold mb-4">Identity Verification</h3>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="taxId">PAN/Tax ID *</Label>
+                      <Input
+                        id="taxId"
+                        name="taxId"
+                        value={formData.taxId}
+                        onChange={handleChange}
+                        required={formData.requiresOnlinePayment}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="governmentId">Government ID (Aadhaar/Passport) *</Label>
+                      <Input
+                        id="governmentId"
+                        name="governmentId"
+                        value={formData.governmentId}
+                        onChange={handleChange}
+                        required={formData.requiresOnlinePayment}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="selfie">Photo Verification *</Label>
+                      <Input
+                        id="selfie"
+                        name="selfie"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleChange}
+                        required={formData.requiresOnlinePayment}
+                      />
+                    </div>
+
+                    {/* Address Details */}
+                    <div className="md:col-span-2">
+                      <h3 className="text-lg font-semibold mb-4">Address Details</h3>
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="permanentAddress">Permanent Address *</Label>
+                      <Textarea
+                        id="permanentAddress"
+                        name="permanentAddress"
+                        value={formData.permanentAddress}
+                        onChange={handleChange}
+                        required={formData.requiresOnlinePayment}
+                      />
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="correspondenceAddress">Correspondence Address</Label>
+                      <Textarea
+                        id="correspondenceAddress"
+                        name="correspondenceAddress"
+                        value={formData.correspondenceAddress}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="flex items-center justify-between pt-6">
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate('/login')}
+                  onClick={() => {
+                    setFormData({
+                      fullName: '',
+                      email: '',
+                      phoneNumber: '',
+                      whatsappNumber: '',
+                      dateOfBirth: '',
+                      gender: '',
+                      fullAddress: '',
+                      district: '',
+                      state: '',
+                      pinCode: '',
+                      subjects: '',
+                      classes: '',
+                      board: '',
+                      university: '',
+                      socialLinks: '',
+                      requiresOnlinePayment: false,
+                      bankAccountNumber: '',
+                      ifscCode: '',
+                      accountType: '',
+                      bankName: '',
+                      governmentId: '',
+                      selfie: '',
+                      permanentAddress: '',
+                      correspondenceAddress: '',
+                      taxId: ''
+                    });
+                    navigate('/login', { replace: true });
+                  }}
                 >
                   Back to Login
                 </Button>
