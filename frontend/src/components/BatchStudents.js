@@ -1,13 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { AlertTriangle } from 'lucide-react';
+import { Input } from './ui/input';
 
 const BatchStudents = ({ students, payments, userRole, onSendFeeNotification, getPaymentStatusBadgeType, styles }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredStudents = students.filter(student =>
+    student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    student.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="grid gap-4">
-      {students.map(student => {
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex-1 mr-4">
+          <Input
+            type="search"
+            placeholder="Search students..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="max-w-sm"
+          />
+        </div>
+      </div>
+      <div className="grid gap-4">
+        {filteredStudents.map(student => {
         const studentPayments = payments.filter(p => p.studentId === student.id);
         const hasUnpaidFees = studentPayments.some(p => p.status === 'pending' || p.status === 'overdue');
 
@@ -42,6 +62,7 @@ const BatchStudents = ({ students, payments, userRole, onSendFeeNotification, ge
           </Card>
         );
       })}
+      </div>
     </div>
   );
 };

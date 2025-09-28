@@ -15,8 +15,10 @@ import {
   CreditCard, 
   Bell, 
   Plus, 
-  Upload
+  Upload,
+  UserPlus
 } from 'lucide-react';
+import BatchJoiningRequests from './BatchJoiningRequests';
 import { 
   mockStudents, 
   mockMaterials, 
@@ -310,10 +312,14 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
           </div>
 
           {/* Desktop Tab Navigation */}
-          <TabsList className={`${styles.card} hidden md:grid w-full grid-cols-5`}>
+          <TabsList className={`${styles.card} hidden md:grid w-full grid-cols-6`}>
             <TabsTrigger value="students" className="flex items-center space-x-2 data-[state=active]:bg-primary data-[state=active]:text-white">
               <Users className="w-4 h-4" />
               <span>Students</span>
+            </TabsTrigger>
+            <TabsTrigger value="joining-requests" className="flex items-center space-x-2 data-[state=active]:bg-primary data-[state=active]:text-white">
+              <UserPlus className="w-4 h-4" />
+              <span>Joining Requests</span>
             </TabsTrigger>
             <TabsTrigger value="materials" className="flex items-center space-x-2 data-[state=active]:bg-primary data-[state=active]:text-white">
               <FileText className="w-4 h-4" />

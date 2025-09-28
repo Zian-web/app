@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { useToast } from '../../hooks/use-toast';
 import { 
   ArrowLeft, 
   FileText, 
@@ -21,6 +22,17 @@ import StudentPayments from './StudentPayments';
 
 const StudentBatchView = ({ batch, onBack, currentUser }) => {
   const [activeTab, setActiveTab] = useState('materials');
+  const { toast } = useToast();
+
+  const handleJoinRequest = (batchId) => {
+    // Here you would typically make an API call to submit the join request
+    toast({
+      title: "Join Request Submitted",
+      description: "Your request to join this batch has been sent to the teacher.",
+      duration: 3000,
+    });
+    // You could also update some local state to show a pending status
+  };
 
   // Get batch-specific data for current student
   const batchMaterials = mockMaterials.filter(material => 
@@ -74,7 +86,18 @@ const StudentBatchView = ({ batch, onBack, currentUser }) => {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               {batch.name}
-              <Badge variant="secondary">{batch.subject}</Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary">{batch.subject}</Badge>
+                {!batch.students?.includes(currentUser.id) && (
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    onClick={() => handleJoinRequest(batch.id)}
+                  >
+                    JOIN BATCH
+                  </Button>
+                )}
+              </div>
             </CardTitle>
             <CardDescription>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
