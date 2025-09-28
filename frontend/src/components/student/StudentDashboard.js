@@ -203,7 +203,16 @@ const StudentDashboard = () => {
       {/* Batches Tab */}
       {activeTab === 'batches' && (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold">My Enrolled Batches</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold">My Enrolled Batches</h2>
+            <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => {
+              // TODO: Implement join new batch functionality
+              console.log('Join new batch clicked');
+            }}>
+              <BookOpen className="w-4 h-4 mr-2" />
+              Join New Batch
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {studentBatches.map(batch => (
               <Card key={batch.id} className="cursor-pointer hover:shadow-lg transition-shadow">
