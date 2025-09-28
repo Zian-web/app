@@ -34,11 +34,11 @@ const ResponsiveLayout = ({
               <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
-              <div className="hidden sm:block">
-                <h1 className="text-xl font-bold text-slate-900">
+              <div className="flex flex-col">
+                <h1 className="text-lg font-bold text-slate-900">
                   {userRole === 'teacher' ? 'Teacher Portal' : 'Student Portal'}
                 </h1>
-                <p className="text-sm text-slate-600">Welcome, {userName}</p>
+                <p className="text-xs text-slate-600 hidden sm:block">Welcome, {userName}</p>
               </div>
             </div>
           </div>
@@ -61,7 +61,7 @@ const ResponsiveLayout = ({
         {/* Desktop Navigation */}
         <div className="hidden md:block mb-6">
           <Tabs value={activeTab} onValueChange={onTabChange}>
-            <TabsList className={`grid w-full bg-white ${userRole === 'teacher' ? 'grid-cols-7' : 'grid-cols-6'}`}>
+            <TabsList className="grid w-full grid-flow-col auto-cols-fr bg-white">
               {tabs.map((tab) => (
                 <TabsTrigger 
                   key={tab.value} 

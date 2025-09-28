@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Login from "./components/Login";
 import TeacherDashboard from "./components/teacher/TeacherDashboard";
@@ -40,10 +40,10 @@ function App() {
   return (
     <div className="App">
       <AuthProvider>
-        <BrowserRouter>
+        <HashRouter>
           <AppContent />
           <Toaster />
-        </BrowserRouter>
+        </HashRouter>
       </AuthProvider>
     </div>
   );
