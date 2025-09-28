@@ -1,18 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Plus, Eye, Edit, Trash2 } from 'lucide-react';
+import AddBatchDialog from '../AddBatchDialog';
+import { useToast } from '../../hooks/use-toast';
 
-const TeacherBatches = ({ batches, onSelectBatch }) => {
+const TeacherBatches = ({ batches, onSelectBatch, onAddBatch }) => {
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { toast } = useToast();
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h2 className="text-2xl font-bold">My Batches</h2>
-        <Button className="flex items-center space-x-2">
+        <Button
+          className="flex items-center space-x-2"
+          onClick={() => setIsAddDialogOpen(true)}
+        >
           <Plus className="w-4 h-4" />
           <span>Add Batch</span>
         </Button>
       </div>
+      <AddBatchDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onAddBatch={onAddBatch}
+      />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {batches.map(batch => (
           <Card key={batch.id} className="cursor-pointer hover:shadow-lg transition-shadow">

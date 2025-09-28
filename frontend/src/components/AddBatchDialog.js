@@ -7,8 +7,7 @@ import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, Dialog
 import { toast } from '../hooks/use-toast';
 import { Plus } from 'lucide-react';
 
-const AddBatchDialog = ({ onAddBatch }) => {
-  const [open, setOpen] = useState(false);
+const AddBatchDialog = ({ open, onOpenChange, onAddBatch }) => {
   const [batchData, setBatchData] = useState({
     name: '',
     subject: '',
@@ -36,7 +35,7 @@ const AddBatchDialog = ({ onAddBatch }) => {
 
     onAddBatch(newBatch);
     setBatchData({ name: '', subject: '', schedule: '', startDate: '', endDate: '' });
-    setOpen(false);
+    onOpenChange(false);
     toast({
       title: "Success",
       description: "Batch added successfully",
@@ -45,13 +44,7 @@ const AddBatchDialog = ({ onAddBatch }) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="flex items-center space-x-2">
-          <Plus className="w-4 h-4" />
-          <span>Add Batch</span>
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Add New Batch</DialogTitle>
@@ -107,7 +100,7 @@ const AddBatchDialog = ({ onAddBatch }) => {
           </div>
         </div>
         <div className="flex justify-end space-x-2 mt-4">
-          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button onClick={handleAdd}>Add Batch</Button>
         </div>
       </DialogContent>

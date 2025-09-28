@@ -144,10 +144,12 @@ const TeacherDashboard = () => {
     const thisYear = now.getFullYear();
     const prevYear = thisYear - 1;
 
+    console.log("teacherPayments:", teacherPayments);
     const thisMonthPayments = teacherPayments.filter(p => {
       const paidDate = new Date(p.paidDate);
       return p.status === 'paid' && paidDate.getMonth() === thisMonth && paidDate.getFullYear() === thisYear;
     });
+    console.log("thisMonthPayments:", thisMonthPayments);
 
     const thisMonthTotal = thisMonthPayments.reduce((acc, p) => acc + p.amount, 0);
 
@@ -190,11 +192,26 @@ const TeacherDashboard = () => {
         }
       }
     });
+    console.log("monthlyData:", monthlyData);
 
     return { thisMonthTotal, prevYearTotal, topBatch, monthlyData, batchData: batchTotals, thisMonthCashTotal, thisMonthOnlineTotal };
   };
 
   const paymentSummary = getPaymentSummary();
+
+  const handleAddBatch = (newBatch) => {
+    // Add teacher ID to the batch
+    newBatch.teacherId = user.id;
+    
+    // Update mock data (in a real app, this would be an API call)
+    mockBatches.push(newBatch);
+    
+    // Show success message
+    toast({
+      title: "Success",
+      description: `${newBatch.name} batch has been created successfully.`,
+    });
+  };
 
   const tabs = [
     { value: 'dashboard', label: 'Dashboard', icon: <BookOpen className="w-4 h-4" /> },
@@ -233,11 +250,16 @@ const TeacherDashboard = () => {
           materials={teacherMaterials}
           notifications={teacherNotifications}
           onSelectBatch={setSelectedBatch}
+          paymentSummary={paymentSummary}
         />
       )}
 
       {activeTab === 'batches' && (
-        <TeacherBatches batches={teacherBatches} onSelectBatch={setSelectedBatch} />
+        <TeacherBatches
+          batches={teacherBatches}
+          onSelectBatch={setSelectedBatch}
+          onAddBatch={handleAddBatch}
+        />
       )}
 
       {activeTab === 'students' && (
