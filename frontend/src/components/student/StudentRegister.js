@@ -235,7 +235,24 @@ const StudentRegister = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate('/login')}
+                  onClick={() => {
+                    setFormData({
+                        fullName: '',
+                        email: '',
+                        phoneNumber: '',
+                        whatsappNumber: '',
+                        dateOfBirth: '',
+                        gender: '',
+                        fullAddress: '',
+                        pinCode: '',
+                        class: '',
+                        year: '',
+                        institutionName: '',
+                        parentsName: '',
+                        parentsPhone: ''
+                    });
+                    navigate('/login');
+                  }}
                 >
                   Back to Login
                 </Button>

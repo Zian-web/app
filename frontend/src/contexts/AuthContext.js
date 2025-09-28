@@ -16,20 +16,33 @@ export const AuthProvider = ({ children }) => {
   const [role, setRole] = useState(null);
 
   const login = (id, password, selectedRole) => {
-    let userData = null;
-    
-    if (selectedRole === 'teacher') {
-      userData = mockTeachers.find(teacher => teacher.id === id && teacher.password === password);
-    } else if (selectedRole === 'student') {
-      userData = mockStudents.find(student => student.id === id && student.password === password);
-    }
+    try {
+      let userData = null;
+      
+      if (selectedRole === 'teacher') {
+        userData = mockTeachers.find(teacher => teacher.id === id && teacher.password === password);
+      } else if (selectedRole === 'student') {
+        userData = mockStudents.find(student => student.id === id && student.password === password);
+      }
 
-    if (userData) {
-      setUser(userData);
-      setRole(selectedRole);
-      return true;
+      if (userData) {
+        // Clear any existing state first
+        setUser(null);
+        setRole(null);
+        
+        // Set new state after a brief delay to ensure clean state
+        setTimeout(() => {
+          setUser(userData);
+          setRole(selectedRole);
+        }, 0);
+        
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {

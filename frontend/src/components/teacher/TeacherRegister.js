@@ -432,7 +432,7 @@ const TeacherRegister = () => {
                       correspondenceAddress: '',
                       taxId: ''
                     });
-                    navigate('/login', { replace: true });
+                    navigate('/login');
                   }}
                 >
                   Back to Login

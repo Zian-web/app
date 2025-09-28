@@ -16,7 +16,14 @@ const Login = () => {
   const { login } = useAuth();
   const { toast } = useToast();
 
-  const handleSubmit = (e) => {
+  // Reset form state when component mounts
+  React.useEffect(() => {
+    setId('');
+    setPassword('');
+    setSelectedRole('teacher');
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!id || !password) {
@@ -30,7 +37,16 @@ const Login = () => {
 
     const success = login(id, password, selectedRole);
     
-    if (!success) {
+    if (success) {
+      // Clear form
+      setId('');
+      setPassword('');
+      
+      // Navigate after a brief delay to ensure auth state is updated
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
+    } else {
       toast({
         title: "Login Failed",
         description: "Invalid credentials. Please try again.",
@@ -143,19 +159,21 @@ const Login = () => {
                 <div className="space-y-2">
                   <p className="text-gray-600">New to the platform?</p>
                   <div className="space-x-4">
-                    <Link
-                      to="/register/teacher"
+                    <Button
+                      variant="link"
+                      onClick={() => navigate('/register/teacher')}
                       className="text-blue-600 hover:text-blue-700"
                     >
                       Register as Teacher
-                    </Link>
+                    </Button>
                     <span className="text-gray-400">|</span>
-                    <Link
-                      to="/register/student"
+                    <Button
+                      variant="link"
+                      onClick={() => navigate('/register/student')}
                       className="text-blue-600 hover:text-blue-700"
                     >
                       Register as Student
-                    </Link>
+                    </Button>
                   </div>
                 </div>
               </div>

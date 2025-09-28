@@ -22,13 +22,16 @@ const AppContent = () => {
       <Route path="/login" element={<Login />} />
 
       {/* Protected Routes */}
-      {isAuthenticated() ? (
-        <Route path="/*" element={
-          role === 'teacher' ? <TeacherDashboard /> : <StudentDashboard />
-        } />
-      ) : (
-        <Route path="/*" element={<Login />} />
-      )}
+      <Route
+        path="/*"
+        element={
+          isAuthenticated() ? (
+            role === 'teacher' ? <TeacherDashboard /> : <StudentDashboard />
+          ) : (
+            <Login />
+          )
+        }
+      />
     </Routes>
   );
 };
