@@ -7,6 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
 import { 
   ArrowLeft, 
   Users, 
@@ -446,45 +454,49 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
               paymentSearch={paymentSearch}
               onSearchChange={(e) => setPaymentSearch(e.target.value)}
             />
-            {showUpdatePayment && selectedPayment && userRole === 'teacher' && (
-              <Card className="border-2 border-blue-200 bg-blue-50">
-                <CardHeader>
-                  <CardTitle>Update Payment Status</CardTitle>
-                  <CardDescription>
-                    Student: {getStudentName(selectedPayment.studentId)} | Amount: ${selectedPayment.amount}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex flex-wrap gap-2">
-                    <Button 
-                      onClick={() => handlePaymentStatusUpdate('paid')}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      Mark as Paid (Cash)
-                    </Button>
-                    <Button 
-                      onClick={() => handlePaymentStatusUpdate('pending')}
-                      variant="outline"
-                      className="border-yellow-600 text-yellow-600 hover:bg-yellow-50"
-                    >
-                      Keep Pending
-                    </Button>
-                    <Button 
-                      onClick={() => handlePaymentStatusUpdate('overdue')}
-                      variant="outline"
-                      className="border-red-600 text-red-600 hover:bg-red-50"
-                    >
-                      Mark Overdue
-                    </Button>
-                    <Button 
-                      onClick={() => setShowUpdatePayment(false)}
-                      variant="outline"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+            {userRole === 'teacher' && (
+            <Dialog open={showUpdatePayment} onOpenChange={setShowUpdatePayment}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Update Payment Status</DialogTitle>
+                  {selectedPayment && (
+                    <DialogDescription>
+                      Student: {getStudentName(selectedPayment.studentId)} | Amount: ${selectedPayment.amount}
+                    </DialogDescription>
+                  )}
+                </DialogHeader>
+                <div className="flex flex-wrap gap-2 py-4">
+                  <Button 
+                    onClick={() => handlePaymentStatusUpdate('paid')}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    Mark as Paid (Cash)
+                  </Button>
+                  <Button 
+                    onClick={() => handlePaymentStatusUpdate('pending')}
+                    variant="outline"
+                    className="border-yellow-600 text-yellow-600 hover:bg-yellow-50"
+                  >
+                    Keep Pending
+                  </Button>
+                  <Button 
+                    onClick={() => handlePaymentStatusUpdate('overdue')}
+                    variant="outline"
+                    className="border-red-600 text-red-600 hover:bg-red-50"
+                  >
+                    Mark Overdue
+                  </Button>
+                </div>
+                <DialogFooter>
+                  <Button 
+                    onClick={() => setShowUpdatePayment(false)}
+                    variant="outline"
+                  >
+                    Cancel
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
             )}
           </TabsContent>
 

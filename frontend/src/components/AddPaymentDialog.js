@@ -58,7 +58,7 @@ const AddPaymentDialog = ({ students, batches, onAddPayment }) => {
             <Input id="amount" type="number" value={amount} onChange={e => setAmount(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="dueDate">Due Date</Label>
+            <Label htmlFor="dueDate">Payment Date</Label>
             <Input id="dueDate" type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
           </div>
           <div>
