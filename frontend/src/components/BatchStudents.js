@@ -15,14 +15,14 @@ const BatchStudents = ({ students, payments, userRole, onSendFeeNotification, ge
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex-1 mr-4">
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
+        <div className="flex-1 mr-4 w-full sm:w-auto">
           <Input
             type="search"
             placeholder="Search students..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="max-w-sm"
+            className="max-w-sm w-full"
           />
         </div>
       </div>
@@ -34,13 +34,13 @@ const BatchStudents = ({ students, payments, userRole, onSendFeeNotification, ge
         return (
           <Card key={student.id} className={styles.card}>
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex-1">
                   <h3 className="font-medium text-neutral-dark">{student.name}</h3>
                   <p className="text-sm text-neutral">{student.email}</p>
                   <p className="text-sm text-neutral">{student.phone}</p>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-wrap items-center space-x-2 mt-4 sm:mt-0">
                   {hasUnpaidFees && userRole === 'teacher' && (
                     <Button
                       size="sm"

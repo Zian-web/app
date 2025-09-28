@@ -88,7 +88,7 @@ const BatchStudentManager = ({ batch, userRole }) => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex justify-end space-x-2">
+              <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
                 <Button variant="outline" onClick={() => setShowAddStudent(false)}>
                   Cancel
                 </Button>
@@ -99,42 +99,44 @@ const BatchStudentManager = ({ batch, userRole }) => {
             </div>
           </div>
         )}
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {batchStudents.map(student => (
-              <TableRow key={student.id}>
-                <TableCell>{student.id}</TableCell>
-                <TableCell>{student.name}</TableCell>
-                <TableCell>{student.email}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <Button variant="ghost" size="icon" onClick={() => {
-                      toast({
-                        title: "View Student",
-                        description: `Viewing ${student.name}'s details`,
-                      });
-                    }}>
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                    {userRole === 'teacher' && (
-                      <Button variant="ghost" size="icon" onClick={() => handleRemoveStudent(student)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="hidden md:table-header-group">
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {batchStudents.map(student => (
+                <TableRow key={student.id} className="flex flex-col md:table-row mb-4 md:mb-0">
+                  <TableCell className="md:table-cell" data-label="ID">{student.id}</TableCell>
+                  <TableCell className="md:table-cell" data-label="Name">{student.name}</TableCell>
+                  <TableCell className="md:table-cell" data-label="Email">{student.email}</TableCell>
+                  <TableCell className="md:table-cell" data-label="Actions">
+                    <div className="flex space-x-2">
+                      <Button variant="ghost" size="icon" onClick={() => {
+                        toast({
+                          title: "View Student",
+                          description: `Viewing ${student.name}'s details`,
+                        });
+                      }}>
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      {userRole === 'teacher' && (
+                        <Button variant="ghost" size="icon" onClick={() => handleRemoveStudent(student)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

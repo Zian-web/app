@@ -13,7 +13,7 @@ const TeacherStudents = ({ students, batchIds, getPaymentStatusColor }) => {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
+              <TableHeader className="hidden md:table-header-group">
                 <TableRow>
                   <TableHead>Student ID</TableHead>
                   <TableHead>Name</TableHead>
@@ -25,13 +25,13 @@ const TeacherStudents = ({ students, batchIds, getPaymentStatusColor }) => {
               </TableHeader>
               <TableBody>
                 {students.map(student => (
-                  <TableRow key={student.id}>
-                    <TableCell className="font-medium">{student.id}</TableCell>
-                    <TableCell>{student.name}</TableCell>
-                    <TableCell>{student.email}</TableCell>
-                    <TableCell>{student.enrolledBatches.filter(batchId => batchIds.includes(batchId)).length} batches</TableCell>
-                    <TableCell><Badge className={getPaymentStatusColor(student.paymentStatus)}>{student.paymentStatus}</Badge></TableCell>
-                    <TableCell>
+                  <TableRow key={student.id} className="flex flex-col md:table-row mb-4 md:mb-0">
+                    <TableCell className="font-medium md:table-cell" data-label="Student ID">{student.id}</TableCell>
+                    <TableCell className="md:table-cell" data-label="Name">{student.name}</TableCell>
+                    <TableCell className="md:table-cell" data-label="Email">{student.email}</TableCell>
+                    <TableCell className="md:table-cell" data-label="Enrolled Batches">{student.enrolledBatches.filter(batchId => batchIds.includes(batchId)).length} batches</TableCell>
+                    <TableCell className="md:table-cell" data-label="Payment Status"><Badge className="bg-gray-200 text-gray-800">{student.paymentStatus}</Badge></TableCell>
+                    <TableCell className="md:table-cell" data-label="Actions">
                       <Button size="sm" variant="outline" className="mr-2">
                         <Eye className="w-4 h-4" />
                       </Button>
