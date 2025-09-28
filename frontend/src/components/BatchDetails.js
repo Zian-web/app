@@ -308,6 +308,15 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
                 <Bell className="w-4 h-4" />
                 <span>Notifications</span>
               </Button>
+              <Button
+                variant={activeTab === 'joining-requests' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('joining-requests')}
+                className="flex items-center space-x-2 whitespace-nowrap"
+              >
+                <UserPlus className="w-4 h-4" />
+                <span>Joining Requests</span>
+              </Button>
             </div>
           </div>
 
@@ -348,6 +357,15 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
               onSendFeeNotification={sendFeeNotification}
               getPaymentStatusBadgeType={getPaymentStatusBadgeType}
               styles={styles}
+            />
+          </TabsContent>
+
+          {/* Joining Requests Tab */}
+          <TabsContent value="joining-requests" className="space-y-6">
+            <BatchJoiningRequests 
+              requests={[]} 
+              onApprove={() => {}} 
+              onReject={() => {}} 
             />
           </TabsContent>
 
