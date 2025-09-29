@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -10,7 +10,32 @@ import { useToast } from '../../hooks/use-toast';
 
 const StudentPayments = ({ payments, getPaymentStatusColor }) => {
   const [paymentAmount, setPaymentAmount] = useState('');
+  const [displayedPayments, setDisplayedPayments] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const itemsPerPage = 10;
   const { toast } = useToast();
+
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const newPayments = payments.slice(startIndex, endIndex);
+    
+    if (currentPage === 1) {
+      setDisplayedPayments(newPayments);
+    } else {
+      setDisplayedPayments(prev => [...prev, ...newPayments]);
+    }
+    setIsLoading(false);
+  }, [currentPage, payments]);
+
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollHeight - scrollTop === clientHeight && !isLoading && displayedPayments.length < payments.length) {
+      setIsLoading(true);
+      setCurrentPage(prev => prev + 1);
+    }
+  };
 
   const handleMakePayment = () => {
     if (!paymentAmount || paymentAmount <= 0) {
@@ -60,10 +85,10 @@ const StudentPayments = ({ payments, getPaymentStatusColor }) => {
                 min="1"
               />
             </div>
-            <Button onClick={handleMakePayment} className="w-full" disabled={!paymentAmount}>
-              <DollarSign className="w-4 h-4 mr-2" />
-              Make Payment
-            </Button>
+             <Button onClick={handleMakePayment} variant="deep-blue" className="w-full" disabled={!paymentAmount}>
+               <DollarSign className="w-4 h-4 mr-2" />
+               Make Payment
+             </Button>
             <p className="text-sm text-slate-600">Note: This is a demo. No actual payment will be processed.</p>
           </CardContent>
         </Card>
@@ -90,25 +115,39 @@ const StudentPayments = ({ payments, getPaymentStatusColor }) => {
       <Card>
         <CardHeader><CardTitle>Payment History</CardTitle></CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
+          <div 
+            className="overflow-x-auto h-[75vh] sm:h-[80vh] md:h-[85vh] min-h-[600px] overflow-y-auto"
+            onScroll={handleScroll}
+          >
+            <Table className="w-full">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Paid Date</TableHead>
+                  <TableHead className="w-[25%]">Amount</TableHead>
+                  <TableHead className="w-[25%]">Due Date</TableHead>
+                  <TableHead className="w-[25%]">Status</TableHead>
+                  <TableHead className="w-[25%]">Paid Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {payments.map(payment => (
+                {displayedPayments.map((payment) => (
                   <TableRow key={payment.id}>
-                    <TableCell>${payment.amount}</TableCell>
-                    <TableCell>{payment.dueDate}</TableCell>
-                    <TableCell><Badge className={getPaymentStatusColor(payment.status)}>{payment.status}</Badge></TableCell>
-                    <TableCell>{payment.paidDate || 'N/A'}</TableCell>
+                    <TableCell className="w-[25%]">${payment.amount}</TableCell>
+                    <TableCell className="w-[25%]">{payment.dueDate}</TableCell>
+                     <TableCell className="w-[25%]">
+                       <Badge variant={payment.status === 'paid' ? 'success' : payment.status === 'pending' ? 'warning' : 'destructive'}>
+                         {payment.status}
+                       </Badge>
+                     </TableCell>
+                    <TableCell className="w-[25%]">{payment.paidDate || 'N/A'}</TableCell>
                   </TableRow>
                 ))}
+                {isLoading && (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-4">
+                      Loading more payments...
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>

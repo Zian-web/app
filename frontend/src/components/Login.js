@@ -81,7 +81,7 @@ const Login = () => {
                     onClick={() => setSelectedRole('teacher')}
                     className={`h-14 text-lg font-medium ${
                       selectedRole === 'teacher'
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        ? 'bg-blue-800 hover:bg-blue-900 text-white'
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300'
                     }`}
                     variant={selectedRole === 'teacher' ? 'default' : 'outline'}
@@ -93,7 +93,7 @@ const Login = () => {
                     onClick={() => setSelectedRole('student')}
                     className={`h-14 text-lg font-medium ${
                       selectedRole === 'student'
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        ? 'bg-blue-700 hover:bg-blue-800 text-white'
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300'
                     }`}
                     variant={selectedRole === 'student' ? 'default' : 'outline'}
@@ -140,35 +140,36 @@ const Login = () => {
               </div>
 
               {/* Submit Button */}
-              <Button type="submit" className="w-full h-12 text-lg">
+              <Button type="submit" variant="light-blue" className="w-full h-12 text-lg">
                 Login
               </Button>
 
               {/* Links */}
-              <div className="space-y-4 text-center">
+              <div className="space-y-6 text-center pt-4">
                 <div>
                   <Link
                     to="/forgot-password"
-                    className="text-blue-600 hover:text-blue-700 text-sm"
+                    className="text-primary-500 hover:text-primary-600 text-sm font-medium"
                   >
                     Forgot Password?
                   </Link>
                 </div>
-                <div className="space-y-2">
-                  <p className="text-gray-600">New to the platform?</p>
-                  <div className="space-x-4">
+                
+                <div className="space-y-3">
+                  <p className="text-gray-600 text-sm">New to the platform?</p>
+                  <div className="flex items-center justify-center gap-2">
                     <Button
                       variant="link"
                       onClick={() => navigate('/register/teacher')}
-                      className="text-blue-600 hover:text-blue-700"
+                      className="text-primary-500 hover:text-primary-600 font-medium p-0 h-auto"
                     >
                       Register as Teacher
                     </Button>
-                    <span className="text-gray-400">|</span>
+                    <span className="text-gray-300 mx-2">|</span>
                     <Button
                       variant="link"
                       onClick={() => navigate('/register/student')}
-                      className="text-blue-600 hover:text-blue-700"
+                      className="text-primary-500 hover:text-primary-600 font-medium p-0 h-auto"
                     >
                       Register as Student
                     </Button>

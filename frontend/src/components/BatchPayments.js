@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -17,6 +17,31 @@ const BatchPayments = ({
 }) => {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [showUpdatePayment, setShowUpdatePayment] = useState(false);
+  const [displayedPayments, setDisplayedPayments] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const newPayments = payments.slice(startIndex, endIndex);
+    
+    if (currentPage === 1) {
+      setDisplayedPayments(newPayments);
+    } else {
+      setDisplayedPayments(prev => [...prev, ...newPayments]);
+    }
+    setIsLoading(false);
+  }, [currentPage, payments]);
+
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollHeight - scrollTop === clientHeight && !isLoading && displayedPayments.length < payments.length) {
+      setIsLoading(true);
+      setCurrentPage(prev => prev + 1);
+    }
+  };
 
   const handleUpdatePayment = (payment) => {
     setSelectedPayment(payment);
@@ -48,32 +73,35 @@ const BatchPayments = ({
 
       <Card>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
+          <div 
+            className="overflow-x-auto h-[75vh] sm:h-[80vh] md:h-[85vh] min-h-[600px] overflow-y-auto"
+            onScroll={handleScroll}
+          >
+            <Table className="w-full">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Student</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Paid Date</TableHead>
-                  {userRole === 'teacher' && <TableHead>Actions</TableHead>}
+                  <TableHead className="w-[20%]">Student</TableHead>
+                  <TableHead className="w-[15%]">Amount</TableHead>
+                  <TableHead className="w-[20%]">Due Date</TableHead>
+                  <TableHead className="w-[15%]">Status</TableHead>
+                  <TableHead className="w-[20%]">Paid Date</TableHead>
+                  {userRole === 'teacher' && <TableHead className="w-[10%]">Actions</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {payments.map(payment => (
+                {displayedPayments.map((payment) => (
                   <TableRow key={payment.id}>
-                    <TableCell className="font-medium">{getStudentName(payment.studentId)}</TableCell>
-                    <TableCell>${payment.amount}</TableCell>
-                    <TableCell>{payment.dueDate}</TableCell>
-                    <TableCell>
-                      <Badge className={getPaymentStatusColor(payment.status)}>
+                    <TableCell className="font-medium w-[20%]">{getStudentName(payment.studentId)}</TableCell>
+                    <TableCell className="w-[15%]">${payment.amount}</TableCell>
+                    <TableCell className="w-[20%]">{payment.dueDate}</TableCell>
+                    <TableCell className="w-[15%]">
+                      <Badge variant={payment.status === 'paid' ? 'success' : payment.status === 'pending' ? 'warning' : 'destructive'}>
                         {payment.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>{payment.paidDate || 'N/A'}</TableCell>
+                    <TableCell className="w-[20%]">{payment.paidDate || 'N/A'}</TableCell>
                     {userRole === 'teacher' && (
-                      <TableCell>
+                      <TableCell className="w-[10%]">
                         <Button
                           size="sm"
                           variant="outline"
@@ -86,6 +114,13 @@ const BatchPayments = ({
                     )}
                   </TableRow>
                 ))}
+                {isLoading && (
+                  <TableRow>
+                    <TableCell colSpan={userRole === 'teacher' ? 6 : 5} className="text-center py-4">
+                      Loading more payments...
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
