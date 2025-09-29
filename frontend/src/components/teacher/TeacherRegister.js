@@ -8,10 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { useToast } from '../../hooks/use-toast';
 import { Textarea } from '../ui/textarea';
 import { Switch } from '../ui/switch';
+import TermsAndConditionsDialog from '../TermsAndConditionsDialog';
 
 const TeacherRegister = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -63,6 +65,13 @@ const TeacherRegister = () => {
       return;
     }
 
+    // Show terms dialog instead of directly registering
+    setShowTermsDialog(true);
+  };
+
+  const handleTermsAccept = async () => {
+    setShowTermsDialog(false);
+    
     try {
       // Add API call here to register teacher
       toast({
@@ -77,6 +86,15 @@ const TeacherRegister = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleTermsDecline = () => {
+    setShowTermsDialog(false);
+    toast({
+      title: "Terms Required",
+      description: "You must accept the terms and conditions to complete registration.",
+      variant: "destructive"
+    });
   };
 
   return (
@@ -445,6 +463,12 @@ const TeacherRegister = () => {
           </CardContent>
         </Card>
       </div>
+      
+      <TermsAndConditionsDialog
+        isOpen={showTermsDialog}
+        onAccept={handleTermsAccept}
+        onDecline={handleTermsDecline}
+      />
     </div>
   );
 };

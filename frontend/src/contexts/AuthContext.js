@@ -26,16 +26,8 @@ export const AuthProvider = ({ children }) => {
       }
 
       if (userData) {
-        // Clear any existing state first
-        setUser(null);
-        setRole(null);
-        
-        // Set new state after a brief delay to ensure clean state
-        setTimeout(() => {
-          setUser(userData);
-          setRole(selectedRole);
-        }, 0);
-        
+        setUser(userData);
+        setRole(selectedRole);
         return true;
       }
       return false;
@@ -59,7 +51,8 @@ export const AuthProvider = ({ children }) => {
     role,
     login,
     logout,
-    isAuthenticated
+    isAuthenticated,
+    setUser
   };
 
   return (

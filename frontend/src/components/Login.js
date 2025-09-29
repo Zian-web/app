@@ -42,10 +42,8 @@ const Login = () => {
       setId('');
       setPassword('');
       
-      // Navigate after a brief delay to ensure auth state is updated
-      setTimeout(() => {
-        navigate('/', { replace: true });
-      }, 100);
+      // Navigate directly to dashboard
+      navigate('/', { replace: true });
     } else {
       toast({
         title: "Login Failed",

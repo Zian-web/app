@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { BookOpen, Users, FileText, Bell, Eye } from 'lucide-react';
+import { BookOpen, Users, FileText, Bell, Eye, CreditCard } from 'lucide-react';
 import PaymentSummary from '../PaymentSummary';
+import BankAccountDetailsDialog from '../BankAccountDetailsDialog';
 
 const TeacherDashboardOverview = ({
   batches,
@@ -12,6 +13,7 @@ const TeacherDashboardOverview = ({
   notifications,
   onSelectBatch
 }) => {
+  const [showBankDetailsDialog, setShowBankDetailsDialog] = useState(false);
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -53,6 +55,29 @@ const TeacherDashboardOverview = ({
         </Card>
       </div>
 
+      {/* Upgrade to Online Payment */}
+      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-blue-100 rounded-full">
+                <CreditCard className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Upgrade to Online Payment</h3>
+                <p className="text-sm text-gray-600">Enable online payment collection from students</p>
+              </div>
+            </div>
+            <Button 
+              onClick={() => setShowBankDetailsDialog(true)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Upgrade Now
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
@@ -90,6 +115,11 @@ const TeacherDashboardOverview = ({
           </CardContent>
         </Card>
       </div>
+      
+      <BankAccountDetailsDialog
+        isOpen={showBankDetailsDialog}
+        onClose={() => setShowBankDetailsDialog(false)}
+      />
     </div>
   );
 };

@@ -6,12 +6,14 @@ import { Badge } from '../ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import ResponsiveLayout from '../ResponsiveLayout';
 import StudentBatchView from './StudentBatchView';
+import StudentSettings from './StudentSettings';
 import { 
   BookOpen, 
   FileText, 
   CreditCard, 
   Calendar,
   User,
+  Settings,
   Eye
 } from 'lucide-react';
 import { 
@@ -60,7 +62,8 @@ const StudentDashboard = () => {
     { value: 'materials', label: 'Materials', icon: <FileText className="w-4 h-4" /> },
     { value: 'attendance', label: 'Attendance', icon: <Calendar className="w-4 h-4" /> },
     { value: 'payments', label: 'Payments', icon: <CreditCard className="w-4 h-4" /> },
-    { value: 'profile', label: 'Profile', icon: <User className="w-4 h-4" /> }
+    { value: 'profile', label: 'Profile', icon: <User className="w-4 h-4" /> },
+    { value: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> }
   ];
 
   const getBatchName = (batchId) => {
@@ -245,7 +248,7 @@ const StudentDashboard = () => {
           <h2 className="text-2xl font-bold">Study Materials</h2>
           <Card>
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
+              <div className="overflow-y-auto h-96">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -410,6 +413,11 @@ const StudentDashboard = () => {
             </Card>
           </div>
         </div>
+      )}
+
+      {/* Settings Tab */}
+      {activeTab === 'settings' && (
+        <StudentSettings />
       )}
     </ResponsiveLayout>
   );

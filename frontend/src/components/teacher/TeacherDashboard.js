@@ -8,7 +8,8 @@ import {
   Calendar, 
   FileText, 
   CreditCard,
-  Bell
+  Bell,
+  Settings
 } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
 import { 
@@ -26,6 +27,7 @@ import TeacherMaterials from './TeacherMaterials';
 import TeacherAttendance from './TeacherAttendance';
 import TeacherPayments from './TeacherPayments';
 import TeacherNotifications from './TeacherNotifications';
+import TeacherSettings from './TeacherSettings';
 import PaymentSummary from '../PaymentSummary';
 
 const TeacherDashboard = () => {
@@ -220,7 +222,8 @@ const TeacherDashboard = () => {
     { value: 'materials', label: 'Materials', icon: <FileText className="w-4 h-4" /> },
     { value: 'attendance', label: 'Attendance', icon: <Calendar className="w-4 h-4" /> },
     { value: 'payments', label: 'Payments', icon: <CreditCard className="w-4 h-4" /> },
-    { value: 'notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> }
+    { value: 'notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> },
+    { value: 'settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> }
   ];
 
   if (selectedBatch) {
@@ -302,6 +305,10 @@ const TeacherDashboard = () => {
 
       {activeTab === 'notifications' && (
         <TeacherNotifications notifications={teacherNotifications} getBatchName={getBatchName} />
+      )}
+
+      {activeTab === 'settings' && (
+        <TeacherSettings />
       )}
     </ResponsiveLayout>
   );
