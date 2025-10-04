@@ -8,7 +8,16 @@ import { Label } from '../ui/label';
 import { DollarSign, History } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
 
-const StudentPayments = ({ payments, getPaymentStatusColor }) => {
+const formatDate = (dateString) => {
+  if (!dateString) return 'N/A';
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
+
+const StudentPayments = ({ payments = [] }) => {
   const [paymentAmount, setPaymentAmount] = useState('');
   const [displayedPayments, setDisplayedPayments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,10 +25,12 @@ const StudentPayments = ({ payments, getPaymentStatusColor }) => {
   const itemsPerPage = 10;
   const { toast } = useToast();
 
+  const validPayments = Array.isArray(payments) ? payments : [];
+
   useEffect(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const newPayments = payments.slice(startIndex, endIndex);
+    const newPayments = validPayments.slice(startIndex, endIndex);
     
     if (currentPage === 1) {
       setDisplayedPayments(newPayments);
@@ -27,11 +38,11 @@ const StudentPayments = ({ payments, getPaymentStatusColor }) => {
       setDisplayedPayments(prev => [...prev, ...newPayments]);
     }
     setIsLoading(false);
-  }, [currentPage, payments]);
+  }, [currentPage, validPayments]);
 
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
-    if (scrollHeight - scrollTop === clientHeight && !isLoading && displayedPayments.length < payments.length) {
+    if (scrollHeight - scrollTop === clientHeight && !isLoading && displayedPayments.length < validPayments.length) {
       setIsLoading(true);
       setCurrentPage(prev => prev + 1);
     }
@@ -48,30 +59,28 @@ const StudentPayments = ({ payments, getPaymentStatusColor }) => {
     }
 
     toast({
-      title: "Payment Successful",
-      description: `Payment of $${paymentAmount} processed successfully (Demo)`,
+      title: "Payment Successful (Demo)",
+      description: `Payment of $${paymentAmount} processed successfully. This is a demo and no real payment was made.`,
       variant: "default"
     });
     setPaymentAmount('');
   };
 
-  const paidAmount = payments.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
-  const pendingAmount = payments.filter(p => p.status !== 'paid').reduce((sum, p) => sum + p.amount, 0);
+  const paidAmount = validPayments.filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
+  const pendingAmount = validPayments.filter(p => p.status !== 'paid').reduce((sum, p) => sum + p.amount, 0);
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Payment Management</h2>
 
-      {/* Payment Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Make Payment */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <DollarSign className="w-5 h-5" />
-              <span>Make Payment</span>
+              <span>Make Payment (Demo)</span>
             </CardTitle>
-            <CardDescription>Make a payment for this batch</CardDescription>
+            <CardDescription>This is a demo feature. No actual payment will be processed.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -85,15 +94,13 @@ const StudentPayments = ({ payments, getPaymentStatusColor }) => {
                 min="1"
               />
             </div>
-             <Button onClick={handleMakePayment} variant="deep-blue" className="w-full" disabled={!paymentAmount}>
+             <Button onClick={handleMakePayment} className="w-full" disabled={!paymentAmount}>
                <DollarSign className="w-4 h-4 mr-2" />
-               Make Payment
+               Make Demo Payment
              </Button>
-            <p className="text-sm text-slate-600">Note: This is a demo. No actual payment will be processed.</p>
           </CardContent>
         </Card>
 
-        {/* Payment Summary */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -103,15 +110,14 @@ const StudentPayments = ({ payments, getPaymentStatusColor }) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex justify-between"><span>Total Payments:</span><span className="font-medium">{payments.length}</span></div>
-              <div className="flex justify-between"><span>Paid Amount:</span><span className="font-medium text-green-600">${paidAmount}</span></div>
-              <div className="flex justify-between"><span>Pending Amount:</span><span className="font-medium text-red-600">${pendingAmount}</span></div>
+              <div className="flex justify-between"><span>Total Payments:</span><span className="font-medium">{validPayments.length}</span></div>
+              <div className="flex justify-between"><span>Paid Amount:</span><span className="font-medium text-green-600">${paidAmount.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span>Pending Amount:</span><span className="font-medium text-red-600">${pendingAmount.toFixed(2)}</span></div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Payment History */}
       <Card>
         <CardHeader><CardTitle>Payment History</CardTitle></CardHeader>
         <CardContent className="p-0">
@@ -122,23 +128,23 @@ const StudentPayments = ({ payments, getPaymentStatusColor }) => {
             <Table className="w-full">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[25%]">Amount</TableHead>
-                  <TableHead className="w-[25%]">Due Date</TableHead>
-                  <TableHead className="w-[25%]">Status</TableHead>
-                  <TableHead className="w-[25%]">Paid Date</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Due Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Paid Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {displayedPayments.map((payment) => (
                   <TableRow key={payment.id}>
-                    <TableCell className="w-[25%]">${payment.amount}</TableCell>
-                    <TableCell className="w-[25%]">{payment.dueDate}</TableCell>
-                     <TableCell className="w-[25%]">
+                    <TableCell>${payment.amount}</TableCell>
+                    <TableCell>{formatDate(payment.due_date)}</TableCell>
+                     <TableCell>
                        <Badge variant={payment.status === 'paid' ? 'success' : payment.status === 'pending' ? 'warning' : 'destructive'}>
                          {payment.status}
                        </Badge>
                      </TableCell>
-                    <TableCell className="w-[25%]">{payment.paidDate || 'N/A'}</TableCell>
+                    <TableCell>{payment.status === 'paid' ? formatDate(payment.updated_at) : 'N/A'}</TableCell>
                   </TableRow>
                 ))}
                 {isLoading && (

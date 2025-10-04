@@ -2,7 +2,7 @@
 // This file handles all authentication-related API calls
 // TODO: Connect to your backend authentication endpoints
 
-import { api } from './api.js';
+import { api } from '../lib/api.js';
 
 export const authService = {
   // Login user

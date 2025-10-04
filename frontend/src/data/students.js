@@ -18,3 +18,6 @@ export const mockStudents = [
 // Note: This is a simplified version for demonstration
 // In production, you would have many more students
 // TODO: Connect to real database when backend is ready
+
+
+export const mockCurrentUser = mockStudents[0];

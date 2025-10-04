@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
@@ -8,428 +8,189 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Textarea } from '../ui/textarea';
 import { Switch } from '../ui/switch';
 import { useToast } from '../../hooks/use-toast';
+// import { updateMyProfile } from '../../lib/api'; // FIXME: Backend endpoint for profile update does not exist.
 
 const TeacherSettings = () => {
-  const { user, setUser } = useAuth();
-  const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    fullName: user.name || '',
-    email: user.email || '',
-    phoneNumber: user.phone || '',
-    whatsappNumber: user.whatsapp || '',
-    dateOfBirth: user.dateOfBirth || '',
-    gender: user.gender || '',
-    fullAddress: user.address || '',
-    district: user.district || '',
-    state: user.state || '',
-    pinCode: user.pinCode || '',
-    subjects: user.subjects || '',
-    classes: user.classes || '',
-    board: user.board || '',
-    university: user.university || '',
-    socialLinks: user.socialLinks || '',
-    requiresOnlinePayment: user.requiresOnlinePayment || false,
-    bankAccountNumber: user.bankAccountNumber || '',
-    ifscCode: user.ifscCode || '',
-    accountType: user.accountType || '',
-    bankName: user.bankName || '',
-    governmentId: user.governmentId || '',
-    selfie: user.selfie || '',
-    permanentAddress: user.permanentAddress || '',
-    correspondenceAddress: user.correspondenceAddress || '',
-    taxId: user.taxId || ''
-  });
+    const { user, setUser } = useAuth();
+    const { toast } = useToast();
+    const [formData, setFormData] = useState({});
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+    // This effect runs when the component mounts or the 'user' object changes,
+    // populating the form with the most current data.
+    useEffect(() => {
+        if (user) {
+            setFormData({
+                fullName: user.full_name || '',
+                email: user.email || '',
+                phoneNumber: user.phone_number || '',
+                whatsappNumber: user.whatsapp_number || '',
+                dateOfBirth: user.date_of_birth || '',
+                gender: user.gender || '',
+                fullAddress: user.full_address || '',
+                district: user.district || '',
+                state: user.state || '',
+                pinCode: user.pin_code || '',
+                subjects: user.subjects || '',
+                classes: user.classes || '',
+                board: user.board || '',
+                university: user.university || '',
+                socialLinks: user.social_links || '',
+                requiresOnlinePayment: user.requires_online_payment || false,
+                bankAccountNumber: user.bank_account_number || '',
+                ifscCode: user.ifsc_code || '',
+                accountType: user.account_type || '',
+                bankName: user.bank_name || '',
+                governmentId: user.government_id_url || '',
+                permanentAddress: user.permanent_address || '',
+                correspondenceAddress: user.correspondence_address || '',
+                taxId: user.tax_id || ''
+            });
+        }
+    }, [user]);
 
-  const handleSelectChange = (name, value) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
 
-  const handleSwitchChange = (checked) => {
-    setFormData(prev => ({ ...prev, requiresOnlinePayment: checked }));
-  };
+    const handleSelectChange = (name, value) => {
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        toast({ title: "Feature Disabled", description: "Profile editing is not yet enabled.", variant: "info" });
+        // FIXME: Backend endpoint for profile update does not exist.
+        /*
+        try {
+            const updatedUser = await updateMyProfile(formData);
+            
+            // Update the global user state with the response from the server
+            setUser(updatedUser);
+            
+            toast({
+                title: "Success",
+                description: "Profile updated successfully!",
+            });
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: error.message || "Failed to update profile. Please try again.",
+                variant: "destructive"
+            });
+        }
+        */
+    };
     
-    try {
-      // In a real application, this would be an API call to update the user's profile
-      // For now, we'll just update the context state
-      const updatedUser = {
-        ...user,
-        name: formData.fullName,
-        email: formData.email,
-        phone: formData.phoneNumber,
-        whatsapp: formData.whatsappNumber,
-        dateOfBirth: formData.dateOfBirth,
-        gender: formData.gender,
-        address: formData.fullAddress,
-        district: formData.district,
-        state: formData.state,
-        pinCode: formData.pinCode,
-        subjects: formData.subjects,
-        classes: formData.classes,
-        board: formData.board,
-        university: formData.university,
-        socialLinks: formData.socialLinks,
-        requiresOnlinePayment: formData.requiresOnlinePayment,
-        bankAccountNumber: formData.bankAccountNumber,
-        ifscCode: formData.ifscCode,
-        accountType: formData.accountType,
-        bankName: formData.bankName,
-        governmentId: formData.governmentId,
-        selfie: formData.selfie,
-        permanentAddress: formData.permanentAddress,
-        correspondenceAddress: formData.correspondenceAddress,
-        taxId: formData.taxId
-      };
-      
-      setUser(updatedUser);
-      
-      toast({
-        title: "Success",
-        description: "Profile updated successfully!",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update profile. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
+    // ... The rest of your JSX remains the same
+    return (
+        <div className="space-y-6">
+            <h2 className="text-2xl font-bold">Settings</h2>
+            <Card>
+                <CardHeader><CardTitle>Edit Profile</CardTitle></CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Personal Information */}
+                        <div className="space-y-2">
+                            <Label htmlFor="fullName">Full Name</Label>
+                            <Input id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="phoneNumber">Phone Number</Label>
+                            <Input id="phoneNumber" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="whatsappNumber">WhatsApp Number</Label>
+                            <Input id="whatsappNumber" name="whatsappNumber" value={formData.whatsappNumber} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                            <Input id="dateOfBirth" name="dateOfBirth" type="date" value={formData.dateOfBirth} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="gender">Gender</Label>
+                            <Select name="gender" onValueChange={(value) => handleSelectChange("gender", value)} value={formData.gender}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select gender" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="male">Male</SelectItem>
+                                    <SelectItem value="female">Female</SelectItem>
+                                    <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-  return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Settings</h2>
-      <Card>
-        <CardHeader>
-          <CardTitle>Edit Profile</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name *</Label>
-                <Input
-                  id="fullName"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+                        {/* Address Information */}
+                        <div className="space-y-2 md:col-span-2">
+                            <Label htmlFor="fullAddress">Full Address</Label>
+                            <Textarea id="fullAddress" name="fullAddress" value={formData.fullAddress} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="district">District</Label>
+                            <Input id="district" name="district" value={formData.district} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="state">State</Label>
+                            <Input id="state" name="state" value={formData.state} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="pinCode">PIN Code</Label>
+                            <Input id="pinCode" name="pinCode" value={formData.pinCode} onChange={handleChange} />
+                        </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+                        {/* Academic Information */}
+                        <div className="space-y-2">
+                            <Label htmlFor="subjects">Subjects</Label>
+                            <Input id="subjects" name="subjects" value={formData.subjects} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="classes">Classes</Label>
+                            <Input id="classes" name="classes" value={formData.classes} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="board">Board</Label>
+                            <Input id="board" name="board" value={formData.board} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="university">University</Label>
+                            <Input id="university" name="university" value={formData.university} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <Label htmlFor="socialLinks">Social Links</Label>
+                            <Input id="socialLinks" name="socialLinks" value={formData.socialLinks} onChange={handleChange} />
+                        </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phoneNumber">Phone Number *</Label>
-                <Input
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+                        {/* Bank Details */}
+                        <div className="space-y-2">
+                            <Label htmlFor="bankAccountNumber">Bank Account Number</Label>
+                            <Input id="bankAccountNumber" name="bankAccountNumber" value={formData.bankAccountNumber} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="ifscCode">IFSC Code</Label>
+                            <Input id="ifscCode" name="ifscCode" value={formData.ifscCode} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="accountType">Account Type</Label>
+                            <Input id="accountType" name="accountType" value={formData.accountType} onChange={handleChange} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="bankName">Bank Name</Label>
+                            <Input id="bankName" name="bankName" value={formData.bankName} onChange={handleChange} />
+                        </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="whatsappNumber">WhatsApp Number *</Label>
-                <Input
-                  id="whatsappNumber"
-                  name="whatsappNumber"
-                  value={formData.whatsappNumber}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="dateOfBirth">Date of Birth *</Label>
-                <Input
-                  id="dateOfBirth"
-                  name="dateOfBirth"
-                  type="date"
-                  value={formData.dateOfBirth}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="gender">Gender *</Label>
-                <Select name="gender" value={formData.gender} onValueChange={(value) => handleSelectChange('gender', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="fullAddress">Full Address *</Label>
-                <Input
-                  id="fullAddress"
-                  name="fullAddress"
-                  value={formData.fullAddress}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="district">District *</Label>
-                <Input
-                  id="district"
-                  name="district"
-                  value={formData.district}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="state">State *</Label>
-                <Input
-                  id="state"
-                  name="state"
-                  value={formData.state}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="pinCode">Pin Code *</Label>
-                <Input
-                  id="pinCode"
-                  name="pinCode"
-                  value={formData.pinCode}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="subjects">Subjects *</Label>
-                <Input
-                  id="subjects"
-                  name="subjects"
-                  placeholder="e.g., Mathematics, Physics"
-                  value={formData.subjects}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="classes">Classes *</Label>
-                <Input
-                  id="classes"
-                  name="classes"
-                  placeholder="e.g., Class 10, 11, 12"
-                  value={formData.classes}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="board">Board *</Label>
-                <Select name="board" value={formData.board} onValueChange={(value) => handleSelectChange('board', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select board" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cbse">CBSE</SelectItem>
-                    <SelectItem value="icse">ICSE</SelectItem>
-                    <SelectItem value="state">State Board</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="university">University *</Label>
-                <Input
-                  id="university"
-                  name="university"
-                  value={formData.university}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="socialLinks">Social Links</Label>
-                <Textarea
-                  id="socialLinks"
-                  name="socialLinks"
-                  placeholder="Enter your social media links"
-                  value={formData.socialLinks}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="space-y-2 md:col-span-2">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="requiresOnlinePayment"
-                    checked={formData.requiresOnlinePayment}
-                    onCheckedChange={handleSwitchChange}
-                  />
-                  <Label htmlFor="requiresOnlinePayment">Enable Online Payment Service</Label>
-                </div>
-              </div>
-
-              {formData.requiresOnlinePayment && (
-                <>
-                  {/* Bank Account Details */}
-                  <div className="md:col-span-2">
-                    <h3 className="text-lg font-semibold mb-4">Bank Account Details</h3>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="bankAccountNumber">Bank Account Number *</Label>
-                    <Input
-                      id="bankAccountNumber"
-                      name="bankAccountNumber"
-                      value={formData.bankAccountNumber}
-                      onChange={handleChange}
-                      required={formData.requiresOnlinePayment}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="ifscCode">IFSC Code *</Label>
-                    <Input
-                      id="ifscCode"
-                      name="ifscCode"
-                      value={formData.ifscCode}
-                      onChange={handleChange}
-                      required={formData.requiresOnlinePayment}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="accountType">Account Type *</Label>
-                    <Select name="accountType" value={formData.accountType} onValueChange={(value) => handleSelectChange('accountType', value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select account type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="savings">Savings</SelectItem>
-                        <SelectItem value="current">Current</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="bankName">Bank Name *</Label>
-                    <Input
-                      id="bankName"
-                      name="bankName"
-                      value={formData.bankName}
-                      onChange={handleChange}
-                      required={formData.requiresOnlinePayment}
-                    />
-                  </div>
-
-                  {/* Identity Verification */}
-                  <div className="md:col-span-2">
-                    <h3 className="text-lg font-semibold mb-4">Identity Verification</h3>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="taxId">PAN/Tax ID *</Label>
-                    <Input
-                      id="taxId"
-                      name="taxId"
-                      value={formData.taxId}
-                      onChange={handleChange}
-                      required={formData.requiresOnlinePayment}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="governmentId">Government ID (Aadhaar/Passport) *</Label>
-                    <Input
-                      id="governmentId"
-                      name="governmentId"
-                      value={formData.governmentId}
-                      onChange={handleChange}
-                      required={formData.requiresOnlinePayment}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="selfie">Photo Verification *</Label>
-                    <Input
-                      id="selfie"
-                      name="selfie"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleChange}
-                      required={formData.requiresOnlinePayment}
-                    />
-                  </div>
-
-                  {/* Address Details */}
-                  <div className="md:col-span-2">
-                    <h3 className="text-lg font-semibold mb-4">Address Details</h3>
-                  </div>
-
-                  <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="permanentAddress">Permanent Address *</Label>
-                    <Textarea
-                      id="permanentAddress"
-                      name="permanentAddress"
-                      value={formData.permanentAddress}
-                      onChange={handleChange}
-                      required={formData.requiresOnlinePayment}
-                    />
-                  </div>
-
-                  <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="correspondenceAddress">Correspondence Address</Label>
-                    <Textarea
-                      id="correspondenceAddress"
-                      name="correspondenceAddress"
-                      value={formData.correspondenceAddress}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div className="flex justify-end pt-6">
-              <Button type="submit">
-                Save Changes
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
+                        <div className="md:col-span-2 flex items-center justify-end">
+                            <Button type="submit" disabled>Save Changes</Button> 
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
+        </div>
+    );
 };
 
 export default TeacherSettings;

@@ -2,7 +2,7 @@
 // This file handles all student-related API calls
 // TODO: Connect to your backend student endpoints
 
-import { api } from './api.js';
+import { api } from '../lib/api.js';
 
 export const studentService = {
   // Get all students

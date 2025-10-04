@@ -22,9 +22,8 @@ const BatchNotifications = ({ notifications, userRole }) => {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 {notification.title}
-                <Badge variant="outline">{notification.type}</Badge>
               </CardTitle>
-              <CardDescription>{notification.date}</CardDescription>
+              <CardDescription>{new Date(notification.created_at).toLocaleDateString()}</CardDescription>
             </CardHeader>
             <CardContent>
               <p>{notification.message}</p>

@@ -54,13 +54,15 @@ const BatchPayments = ({
       <div className="space-y-4">
         <h2 className="text-2xl font-bold">Payment Records</h2>
         <div className="flex flex-col space-y-3">
-          <input
-            type="text"
-            placeholder="Search student..."
-            value={paymentSearch}
-            onChange={onSearchChange}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          {userRole === 'teacher' && (
+            <input
+              type="text"
+              placeholder="Search student..."
+              value={paymentSearch}
+              onChange={onSearchChange}
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          )}
           <div className="flex space-x-2 overflow-x-auto pb-2">
             <Button variant={paymentFilter === 'all' ? 'default' : 'outline'} onClick={() => onFilterChange('all')} className="whitespace-nowrap">All</Button>
             <Button variant={paymentFilter === 'paid' ? 'default' : 'outline'} onClick={() => onFilterChange('paid')} className="whitespace-nowrap">Paid</Button>
@@ -82,7 +84,7 @@ const BatchPayments = ({
               {displayedPayments.map((payment) => (
                 <div key={payment.id} className="bg-gray-50 rounded-lg p-4 border">
                   <div className="flex justify-between items-start mb-2">
-                    <div className="font-medium text-sm">{getStudentName(payment.studentId)}</div>
+                    {userRole === 'teacher' && <div className="font-medium text-sm">{getStudentName(payment.studentId)}</div>}
                     <Badge variant={payment.status === 'paid' ? 'success' : payment.status === 'pending' ? 'warning' : 'destructive'}>
                       {payment.status}
                     </Badge>
@@ -113,6 +115,16 @@ const BatchPayments = ({
                       </Button>
                     </div>
                   )}
+                  {userRole === 'student' && payment.status === 'pending' && (
+                    <div className="mt-3 pt-3 border-t">
+                        <Button
+                            size="sm"
+                            className="w-full"
+                        >
+                            Pay Now
+                        </Button>
+                    </div>
+                  )}
                 </div>
               ))}
               {isLoading && (
@@ -132,18 +144,18 @@ const BatchPayments = ({
               <Table className="w-full">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[20%]">Student</TableHead>
+                    {userRole === 'teacher' && <TableHead className="w-[20%]">Student</TableHead>}
                     <TableHead className="w-[15%]">Amount</TableHead>
                     <TableHead className="w-[20%]">Due Date</TableHead>
                     <TableHead className="w-[15%]">Status</TableHead>
                     <TableHead className="w-[20%]">Paid Date</TableHead>
-                    {userRole === 'teacher' && <TableHead className="w-[10%]">Actions</TableHead>}
+                    <TableHead className="w-[10%]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {displayedPayments.map((payment) => (
                     <TableRow key={payment.id}>
-                      <TableCell className="font-medium w-[20%]">{getStudentName(payment.studentId)}</TableCell>
+                      {userRole === 'teacher' && <TableCell className="font-medium w-[20%]">{getStudentName(payment.studentId)}</TableCell>}
                       <TableCell className="w-[15%]">${payment.amount}</TableCell>
                       <TableCell className="w-[20%]">{payment.dueDate}</TableCell>
                       <TableCell className="w-[15%]">
@@ -152,8 +164,8 @@ const BatchPayments = ({
                         </Badge>
                       </TableCell>
                       <TableCell className="w-[20%]">{payment.paidDate || 'N/A'}</TableCell>
-                      {userRole === 'teacher' && (
-                        <TableCell className="w-[10%]">
+                      <TableCell className="w-[10%]">
+                        {userRole === 'teacher' && (
                           <Button
                             size="sm"
                             variant="outline"
@@ -162,8 +174,15 @@ const BatchPayments = ({
                           >
                             Update
                           </Button>
-                        </TableCell>
-                      )}
+                        )}
+                        {userRole === 'student' && payment.status === 'pending' && (
+                            <Button
+                                size="sm"
+                            >
+                                Pay Now
+                            </Button>
+                        )}
+                      </TableCell>
                     </TableRow>
                   ))}
                   {isLoading && (

@@ -4,7 +4,7 @@
 
 // Export all data from individual files
 export { mockTeachers } from './teachers.js';
-export { mockStudents } from './students.js';
+export { mockStudents, mockCurrentUser } from './students.js';
 export { mockBatches } from './batches.js';
 export { mockPayments } from './payments.js';
 export { mockAttendance } from './attendance.js';
