@@ -62,6 +62,7 @@ const StudentMaterials = ({ materials }) => {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
+                    <p className="text-sm text-slate-600">{material.teacherName} | {material.batchName}</p>
                     <h3 className="font-medium">{material.title}</h3>
                     <div className="flex items-center space-x-2 mt-1">
                       <Badge variant="secondary">PDF</Badge>

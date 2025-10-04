@@ -3,6 +3,7 @@
 // TODO: Connect to your backend authentication endpoints
 
 import { api } from '../lib/api.js';
+import { ENDPOINTS } from '../config/endpoints.js';
 
 export const authService = {
   // Login user
@@ -51,7 +52,7 @@ export const authService = {
   // Get current user
   getCurrentUser: async () => {
     try {
-      const response = await api.get('/auth/me');
+      const response = await api.get(ENDPOINTS.USERS.ME);
       return response;
     } catch (error) {
       console.error('Get current user failed:', error);

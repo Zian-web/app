@@ -13,7 +13,7 @@ import {
   User
 } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
-import { getStudentBatches, getBatchMaterials } from '../../lib/api';
+import { getStudentBatches, getBatchMaterials, getNotificationsForBatch } from '../../lib/api';
 import StudentDashboardOverview from '../student/StudentDashboardOverview';
 import StudentBatches from '../student/StudentBatches';
 import StudentMaterials from '../student/StudentMaterials';
@@ -38,7 +38,6 @@ const StudentDashboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Wait for the full user object to be loaded
       if (!user || !user.id) {
         return;
       }
@@ -52,13 +51,35 @@ const StudentDashboard = () => {
         if (validBatches.length > 0) {
           const materialsPromises = validBatches.map(batch => getBatchMaterials(batch.id));
           const materials = await Promise.all(materialsPromises);
-          setStudentMaterials(materials.flat().filter(Boolean));
+          const materialsWithBatchInfo = validBatches.flatMap((batch, batchIndex) => {
+            const batchMaterials = materials[batchIndex] || [];
+            return batchMaterials.map(material => ({
+              ...material,
+              batchName: batch.name,
+              teacherName: batch.teacher?.name,
+            }));
+          });
+          setStudentMaterials(materialsWithBatchInfo);
+
+          const notificationsPromises = validBatches.map(batch => getNotificationsForBatch(batch.id));
+          const notifications = await Promise.all(notificationsPromises);
+          const notificationsWithBatchInfo = validBatches.flatMap((batch, batchIndex) => {
+            const batchNotifications = notifications[batchIndex] || [];
+            return batchNotifications.map(notification => ({
+              ...notification,
+              batchName: batch.name,
+              teacherName: batch.teacher?.name,
+            }));
+          });
+          
+          // Sort notifications by date and get the top 4
+          const sortedNotifications = notificationsWithBatchInfo.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          setStudentNotifications(sortedNotifications);
+
         } else {
           setStudentMaterials([]);
+          setStudentNotifications([]);
         }
-
-        // Placeholder for notifications
-        setStudentNotifications([]);
 
       } catch (error) {
         console.error('Error fetching student data:', error);
@@ -67,7 +88,6 @@ const StudentDashboard = () => {
           description: "There was a problem loading your dashboard. Please try logging in again.", 
           variant: "destructive" 
         });
-        // Clear data on error
         setStudentBatches([]);
         setStudentMaterials([]);
         setStudentNotifications([]);
@@ -122,7 +142,7 @@ const StudentDashboard = () => {
         <StudentDashboardOverview
           batches={studentBatches || []}
           materials={studentMaterials || []}
-          notifications={studentNotifications || []}
+          notifications={studentNotifications.slice(0, 4) || []}
           onSelectBatch={setSelectedBatch}
           attendanceRate={85}
           pendingPayments={2}
@@ -139,26 +159,23 @@ const StudentDashboard = () => {
       {activeTab === 'materials' && (
         <StudentMaterials 
           materials={studentMaterials}
-          getBatchName={() => ''}
         />
       )}
 
       {activeTab === 'attendance' && (
         <StudentAttendance 
           attendance={studentAttendance}
-          getBatchName={() => ''}
         />
       )}
 
       {activeTab === 'payments' && (
         <StudentPayments
           payments={studentPayments}
-          getBatchName={() => ''}
         />
       )}
 
       {activeTab === 'notifications' && (
-        <StudentNotifications notifications={studentNotifications} getBatchName={() => ''} />
+        <StudentNotifications notifications={studentNotifications} />
       )}
 
       {activeTab === 'profile' && (

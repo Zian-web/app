@@ -42,24 +42,56 @@ const StudentProfile = () => {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" defaultValue={student?.name} />
+              <Label htmlFor="name">Full Name</Label>
+              <Input id="name" defaultValue={student?.full_name} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" defaultValue={student?.email} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" type="tel" defaultValue={student?.phone} />
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input id="phone" type="tel" defaultValue={student?.phone_number} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="whatsapp">WhatsApp Number</Label>
+              <Input id="whatsapp" type="tel" defaultValue={student?.whatsapp_number} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="dob">Date of Birth</Label>
-              <Input id="dob" type="date" defaultValue={student?.dateOfBirth?.split('T')[0]} />
+              <Input id="dob" type="date" defaultValue={student?.date_of_birth?.split('T')[0]} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
-              <Input id="address" defaultValue={student?.address} />
+              <Label htmlFor="gender">Gender</Label>
+              <Input id="gender" defaultValue={student?.gender} />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="address">Full Address</Label>
+              <Input id="address" defaultValue={student?.full_address} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pincode">Pin Code</Label>
+              <Input id="pincode" defaultValue={student?.pin_code} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="class">Class</Label>
+              <Input id="class" defaultValue={student?.student_class} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="year">Year</Label>
+              <Input id="year" defaultValue={student?.year} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="institution">Institution Name</Label>
+              <Input id="institution" defaultValue={student?.institution_name} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="parentName">Parent's Name</Label>
+              <Input id="parentName" defaultValue={student?.parents_name} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="parentPhone">Parent's Phone</Label>
+              <Input id="parentPhone" type="tel" defaultValue={student?.parents_phone} />
             </div>
           </div>
           <Button>Update Profile</Button>

@@ -77,11 +77,12 @@ const StudentDashboardOverview = ({
           <CardHeader><CardTitle>Recent Notifications</CardTitle></CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {notifications.slice(0, 3).map(notification => (
+              {notifications.slice(0, 4).map(notification => (
                 <div key={notification.id} className="p-3 bg-slate-50 rounded-lg">
+                  <p className="text-sm text-slate-600">{notification.teacherName} | {notification.batchName}</p>
                   <p className="font-medium">{notification.title}</p>
                   <p className="text-sm text-slate-600">{notification.message}</p>
-                  <p className="text-xs text-slate-500 mt-1">{notification.date}</p>
+                  <p className="text-xs text-slate-500 mt-1">{new Date(notification.created_at).toLocaleString()}</p>
                 </div>
               ))}
             </div>

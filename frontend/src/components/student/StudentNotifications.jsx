@@ -22,6 +22,7 @@ const StudentNotifications = ({ notifications = [] }) => {
             {(notifications.length > 0) ? (
               notifications.map(notification => (
                 <div key={notification.id} className="p-3 bg-slate-50 rounded-lg">
+                  <p className="text-sm text-slate-600">{notification.teacherName} | {notification.batchName}</p>
                   <p className="font-medium">{notification.title}</p>
                   <p className="text-sm text-slate-600">{notification.message}</p>
                   <p className="text-xs text-slate-500 mt-1">{formatDate(notification.created_at)}</p>
