@@ -130,7 +130,7 @@ const BatchStudents = ({ batchId, students, payments, userRole, onSendFeeNotific
                         </Button>
                       )}
                       {userRole === 'teacher' && <StudentAccessButton batchId={batchId} studentId={student.id} isInitiallyBlocked={student.material_access_blocked} />}
-                      {userRole === 'teacher' && <Button size="sm" variant="destructive" onClick={() => onDeleteStudent(student.enrollmentId)}>Delete</Button>}
+                      {userRole === 'teacher' && <Button size="sm" variant="destructive" onClick={() => onDeleteStudent(student.id)}>Delete</Button>}
                       <Badge className={styles.badge[getPaymentStatusBadgeType(student.paymentStatus)] || styles.badge.warning}>
                         {student.paymentStatus || 'Pending'}
                       </Badge>

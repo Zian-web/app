@@ -148,6 +148,8 @@ export const deleteMaterial = (materialId) => {
     return request(ENDPOINTS.MATERIALS.DELETE(materialId), { method: "DELETE" });
 };
 
+export const getMaterialPresignedUrl = (materialId) => request(ENDPOINTS.MATERIALS.PRESIGNED_URL(materialId));
+
 export const updateBatchMaterial = (materialId, data) => {
     return request(ENDPOINTS.MATERIALS.UPDATE(materialId), {
         method: "PUT",
@@ -191,7 +193,7 @@ export const createNotification = (batchId, data) => {
 export const getNotificationsForBatch = (batchId) => request(ENDPOINTS.BATCH.NOTIFICATIONS.LIST(batchId));
 
 // --- Payment Management ---
-export const getPaymentsForBatch = (batchId) => request(ENDPOINTS.BATCH.PAYMENTS.LIST(batchId));
+export const getPaymentsForBatch = (batchId) => request(`/api/batches/${batchId}/payments`);
 
 // --- Statistics Functions ---
 export const getTotalStudents = () => request(ENDPOINTS.STATS.TOTAL_STUDENTS);

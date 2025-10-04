@@ -1,87 +1,104 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '../ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
-import { Eye } from 'lucide-react';
+import { Badge } from '../ui/badge';
+import { Input } from '../ui/input';
+import { useToast } from '../../hooks/use-toast';
+import { toggleStudentAccess } from '../../lib/api';
 
-const TeacherStudents = ({ students, batchIds, getPaymentStatusColor }) => {
-  const [displayedStudents, setDisplayedStudents] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+const StudentAccessButton = ({ batchId, studentId, isInitiallyBlocked }) => {
+  const { toast } = useToast();
+  const [isBlocked, setIsBlocked] = useState(isInitiallyBlocked);
   const [isLoading, setIsLoading] = useState(false);
-  const itemsPerPage = 10;
 
-  useEffect(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const newStudents = students.slice(startIndex, endIndex);
-    
-    if (currentPage === 1) {
-      setDisplayedStudents(newStudents);
-    } else {
-      setDisplayedStudents(prev => [...prev, ...newStudents]);
-    }
-    setIsLoading(false);
-  }, [currentPage, students]);
-
-  const handleScroll = (e) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.target;
-    if (scrollHeight - scrollTop === clientHeight && !isLoading && displayedStudents.length < students.length) {
-      setIsLoading(true);
-      setCurrentPage(prev => prev + 1);
+  const handleToggleAccess = async () => {
+    setIsLoading(true);
+    try {
+      const response = await toggleStudentAccess(batchId, studentId);
+      setIsBlocked(response.material_access_blocked);
+      toast({
+        title: 'Success',
+        description: response.material_access_blocked
+          ? 'Student access to materials has been blocked.'
+          : 'Student access to materials has been restored.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update student access.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Students</h2>
-      <Card>
-        <CardContent className="p-0">
-          <div 
-            className="overflow-x-auto h-[75vh] sm:h-[80vh] md:h-[85vh] min-h-[600px] overflow-y-auto"
-            onScroll={handleScroll}
-          >
-            <Table className="w-full">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[10%]">Student ID</TableHead>
-                  <TableHead className="w-[20%]">Name</TableHead>
-                  <TableHead className="w-[25%]">Email</TableHead>
-                  <TableHead className="w-[15%]">Enrolled Batches</TableHead>
-                  <TableHead className="w-[15%]">Payment Status</TableHead>
-                  <TableHead className="w-[15%]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {displayedStudents.map((student) => (
-                  <TableRow key={student.id}>
-                    <TableCell className="font-medium w-[10%]">{student.id}</TableCell>
-                    <TableCell className="w-[20%]">{student.name}</TableCell>
-                    <TableCell className="w-[25%]">{student.email}</TableCell>
-                    <TableCell className="w-[15%]">{student.enrolledBatches.filter(batchId => batchIds.includes(batchId)).length} batches</TableCell>
-                    <TableCell className="w-[15%]"><Badge className="bg-gray-200 text-gray-800">{student.paymentStatus}</Badge></TableCell>
-                    <TableCell className="w-[15%]">
-                      <Button size="sm" variant="outline" className="mr-2">
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button size="sm" variant="destructive">
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {isLoading && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-4">
-                      Loading more students...
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+    <Button
+      size="sm"
+      variant={isBlocked ? 'destructive' : 'outline'}
+      onClick={handleToggleAccess}
+      disabled={isLoading}
+      className="mr-2"
+    >
+      {isLoading ? 'Updating...' : (isBlocked ? 'Unblock Access' : 'Block Access')}
+    </Button>
+  );
+};
+
+const TeacherStudents = ({ students, onDeleteStudent }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredStudents = useMemo(() =>
+    students.filter(student =>
+      student.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      student.batch_name.toLowerCase().includes(searchQuery.toLowerCase())
+    ), [students, searchQuery]);
+
+  return (
+    <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-4">
+          <div className="flex-1 mr-4 w-full sm:w-auto">
+            <Input
+              type="search"
+              placeholder="Search students by name, email, or batch..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-lg w-full"
+            />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      <div 
+        className="h-[75vh] sm:h-[80vh] md:h-[85vh] min-h-[600px] overflow-y-auto"
+      >
+        <div className="space-y-4">
+          {filteredStudents.length === 0 ? (
+            <p>No students found.</p>
+          ) : (
+            filteredStudents.map((student) => (
+              <Card key={`${student.id}-${student.batch_id}`}>
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-neutral-dark">{student.full_name}</h3>
+                      <p className="text-sm text-neutral">{student.email}</p>
+                      <p className="text-sm text-neutral-dark font-semibold mt-1">Batch: {student.batch_name}</p>
+                    </div>
+                    <div className="flex flex-wrap items-center space-x-2 mt-4 sm:mt-0">
+                        <StudentAccessButton batchId={student.batch_id} studentId={student.id} isInitiallyBlocked={student.material_access_blocked} />
+                        <Button size="sm" variant="destructive" onClick={() => onDeleteStudent(student.batch_id, student.id)}>Delete</Button>
+                      <Badge className={student.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                        {student.payment_status || 'N/A'}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 };

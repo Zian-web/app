@@ -14,11 +14,10 @@ export const ENDPOINTS = {
         DELETE: (id) => `/api/batches/${id}`,
         UPDATE: (id) => `/api/batches/${id}`,
         DETAILS: (id) => `/api/batches/${id}`,
-        GENERATE_CODE: (id) => `/api/batches/${id}/generate-join-code`, // Corrected
-        INCREASE_LIMIT: (id) => `/api/batches/${id}/limit`, // Corrected
-        JOIN: '/api/student/batches/join', // Corrected
+        GENERATE_CODE: (id) => `/api/batches/${id}/generate-join-code`,
+        JOIN: '/api/student/batches/join',
         STUDENT: {
-            LIST: '/api/student/batches/' // Corrected
+            LIST: '/api/student/batches/'
         },
         MATERIALS: {
             LIST: (batchId) => `/api/batches/${batchId}/materials/`,
@@ -27,10 +26,7 @@ export const ENDPOINTS = {
         STUDENTS: {
             LIST: (batchId) => `/api/batches/${batchId}/students`,
             TOGGLE_ACCESS: (batchId, studentId) => `/api/batches/${batchId}/students/${studentId}/toggle-material-access`,
-            REMOVE: (enrollmentId) => `/api/enrollments/${enrollmentId}`
-        },
-        PAYMENTS: {
-            LIST: (batchId) => `/api/batches/${batchId}/payments/`
+            REMOVE: (batchId, studentId) => `/api/batches/${batchId}/students/${studentId}`,
         },
         JOINING_REQUESTS: {
             LIST: (batchId) => `/api/batches/${batchId}/joining-requests`,
@@ -41,14 +37,13 @@ export const ENDPOINTS = {
             LIST: (batchId) => `/api/batches/${batchId}/notifications`,
             CREATE: (batchId) => `/api/batches/${batchId}/notifications`
         },
+        PAYMENTS: {
+            LIST: (batchId) => `/api/batches/${batchId}/payments`
+        },
     },
     MATERIALS: {
-        DELETE: (materialId) => `/api/materials/${materialId}`
-    },
-    // Kept for compatibility, though BATCH.STUDENTS is more organized
-    ENROLLMENTS: {
-        TOGGLE_ACCESS: (enrollmentId) => `/api/enrollments/${enrollmentId}/toggle-material-access`,
-        REMOVE: (enrollmentId) => `/api/enrollments/${enrollmentId}`
+        DELETE: (materialId) => `/api/materials/${materialId}`,
+        PRESIGNED_URL: (materialId) => `/api/materials/${materialId}/presigned-url`
     }
 };
 

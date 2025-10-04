@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
@@ -6,18 +6,35 @@ import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Plus, Eye, Trash2 } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
-import { mockStudents } from '../../data';
+import { teacherService } from '../../services/teacherService';
 
 const BatchStudentManager = ({ batch, userRole }) => {
   const [showAddStudent, setShowAddStudent] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState('');
+  const [students, setStudents] = useState([]);
   const { toast } = useToast();
 
-  const batchStudents = mockStudents.filter(student => 
-    student.enrolledBatches.includes(batch.id)
-  );
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const fetchedStudents = await teacherService.getBatchStudents(batch.id);
+        setStudents(fetchedStudents);
+      } catch (error) {
+        toast({
+          title: "Error fetching students",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
+    };
+
+    if (batch?.id) {
+      fetchStudents();
+    }
+  }, [batch, toast]);
 
   const handleAddStudent = () => {
+    // TODO: This function still uses mock data and needs to be adapted to use API calls.
     if (!selectedStudent) {
       toast({
         title: "Error",
@@ -27,26 +44,25 @@ const BatchStudentManager = ({ batch, userRole }) => {
       return;
     }
 
-    const student = mockStudents.find(s => s.id === selectedStudent);
-    if (student) {
-      student.enrolledBatches.push(batch.id);
-      toast({
-        title: "Success",
-        description: `${student.name} added to batch successfully`,
-        variant: "default"
-      });
-      setSelectedStudent('');
-      setShowAddStudent(false);
-    }
+    toast({ title: "Info", description: "Add student functionality needs to be updated to work with the API." });
   };
 
-  const handleRemoveStudent = (student) => {
-    student.enrolledBatches = student.enrolledBatches.filter(id => id !== batch.id);
-    toast({
-      title: "Success",
-      description: `${student.name} removed from batch`,
-      variant: "default"
-    });
+  const handleRemoveStudent = async (studentId, studentName) => {
+    try {
+      await teacherService.removeStudentFromBatch(batch.id, studentId);
+      setStudents(prevStudents => prevStudents.filter(s => s.id !== studentId));
+      toast({
+        title: "Success",
+        description: `${studentName} has been removed from the batch.`,
+        variant: "default"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: `Failed to remove student: ${error.message}`,
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -78,13 +94,8 @@ const BatchStudentManager = ({ batch, userRole }) => {
                     <SelectValue placeholder="Select a student" />
                   </SelectTrigger>
                   <SelectContent>
-                    {mockStudents
-                      .filter(s => !s.enrolledBatches.includes(batch.id))
-                      .map(student => (
-                        <SelectItem key={student.id} value={student.id}>
-                          {student.name}
-                        </SelectItem>
-                      ))}
+                    {/* This part needs to be updated to fetch available students from an API */}
+                    <SelectItem value="mock">Mock Student (Not implemented)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -106,15 +117,17 @@ const BatchStudentManager = ({ batch, userRole }) => {
                 <TableHead>ID</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead>Payment Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {batchStudents.map(student => (
+              {students.map(student => (
                 <TableRow key={student.id} className="flex flex-col md:table-row mb-4 md:mb-0">
                   <TableCell className="md:table-cell" data-label="ID">{student.id}</TableCell>
                   <TableCell className="md:table-cell" data-label="Name">{student.name}</TableCell>
                   <TableCell className="md:table-cell" data-label="Email">{student.email}</TableCell>
+                  <TableCell className="md:table-cell" data-label="Payment Status">{student.payment_status || 'N/A'}</TableCell>
                   <TableCell className="md:table-cell" data-label="Actions">
                     <div className="flex space-x-2">
                       <Button variant="ghost" size="icon" onClick={() => {
@@ -126,7 +139,7 @@ const BatchStudentManager = ({ batch, userRole }) => {
                         <Eye className="w-4 h-4" />
                       </Button>
                       {userRole === 'teacher' && (
-                        <Button variant="ghost" size="icon" onClick={() => handleRemoveStudent(student)}>
+                        <Button variant="ghost" size="icon" onClick={() => handleRemoveStudent(student.id, student.name)}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       )}

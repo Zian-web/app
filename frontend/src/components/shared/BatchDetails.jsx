@@ -36,7 +36,8 @@ import {
   getBatchMaterials,
   getPaymentsForBatch,
   uploadMaterial,
-  deleteMaterial
+  deleteMaterial,
+  removeStudent
 } from '../../lib/api';
 import { useToast } from '../../hooks/use-toast';
 import BatchStudents from '../teacher/BatchStudents';
@@ -45,6 +46,7 @@ import BatchAttendance from '../teacher/BatchAttendance';
 import BatchPayments from '../teacher/BatchPayments';
 import BatchNotifications from '../teacher/BatchNotifications';
 import { Textarea } from '../ui/textarea';
+import { teacherService } from '../../services/teacherService';
 
 const getPaymentStatusBadgeType = (status) => {
   if (!status) return 'warning';
@@ -219,9 +221,9 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
     }
   };
 
-  const handleDeleteStudent = async (enrollmentId) => {
+  const handleDeleteStudent = async (studentId) => {
     try {
-      await removeStudent(enrollmentId);
+      await teacherService.removeStudentFromBatch(batch.id, studentId);
       const students = await getBatchStudents(batch.id);
       setBatchStudents(students);
       toast({ title: "Success", description: "Student removed from batch." });

@@ -12,7 +12,7 @@ import {
   Settings
 } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
-import { getMyBatches, getBatchMaterials, createBatch, deleteBatch } from '../../lib/api';
+import { getMyBatches, getBatchMaterials, createBatch, deleteBatch, getNotificationsForBatch, getBatchStudents } from '../../lib/api';
 import TeacherDashboardOverview from '../teacher/TeacherDashboardOverview';
 import TeacherBatches from '../teacher/TeacherBatches';
 import TeacherStudents from '../teacher/TeacherStudents';
@@ -50,6 +50,8 @@ const TeacherDashboard = () => {
       setTeacherBatches(validBatches);
 
       const allMaterials = [];
+      const allNotifications = [];
+
       for (const batch of validBatches) {
         try {
           const batchMaterials = await getBatchMaterials(batch.id);
@@ -64,11 +66,47 @@ const TeacherDashboard = () => {
             variant: "destructive",
           });
         }
+
+        try {
+          const batchNotifications = await getNotificationsForBatch(batch.id);
+          if (batchNotifications) {
+            const notificationsWithBatchName = batchNotifications.map(n => ({ ...n, batchName: batch.name }));
+            allNotifications.push(...notificationsWithBatchName);
+          }
+        } catch (err) {
+          console.error(`Failed to fetch notifications for batch ${batch.id}:`, err);
+          toast({
+            title: `Notifications Error for Batch: ${batch.name}`,
+            description: err.message || "Could not fetch notifications.",
+            variant: "destructive",
+          });
+        }
       }
       setTeacherMaterials(allMaterials);
+      setTeacherNotifications(allNotifications.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
 
-      setTeacherStudents([]);
-      setTeacherNotifications([]);
+      const allStudents = [];
+      for (const batch of validBatches) {
+        try {
+          const batchStudents = await getBatchStudents(batch.id);
+          if (batchStudents) {
+            const studentsWithBatchInfo = batchStudents.map(student => ({
+              ...student,
+              batch_id: batch.id,
+              batch_name: batch.name
+            }));
+            allStudents.push(...studentsWithBatchInfo);
+          }
+        } catch (err) {
+          console.error(`Failed to fetch students for batch ${batch.id}:`, err);
+          toast({
+            title: `Students Error for Batch: ${batch.name}`,
+            description: err.message || "Could not fetch students.",
+            variant: "destructive",
+          });
+        }
+      }
+      setTeacherStudents(allStudents);
 
     } catch (error) {
       console.error('Error fetching main data:', error);
@@ -89,6 +127,29 @@ const TeacherDashboard = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const handleRemoveStudent = async (batchId, studentId) => {
+    try {
+      await teacherService.removeStudentFromBatch(batchId, studentId);
+      setTeacherStudents(prevStudents => prevStudents.filter(s => !(s.id === studentId && s.batch_id === batchId)));
+      toast({
+        title: "Success",
+        description: `Student has been removed from the batch.`,
+        variant: "default"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: `Failed to remove student: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getBatchName = (batchId) => {
+    const batch = teacherBatches.find(b => b.id === batchId);
+    return batch ? batch.name : 'Unknown Batch';
+  };
 
   const handleAddBatch = async (newBatch) => {
     try {
@@ -168,13 +229,13 @@ const TeacherDashboard = () => {
                     />          )}
 
           {activeTab === 'students' && (
-            <TeacherStudents students={teacherStudents} batchIds={teacherBatches.map(b => b.id)} getPaymentStatusColor={() => ''} />
+            <TeacherStudents students={teacherStudents} batchIds={teacherBatches.map(b => b.id)} getPaymentStatusColor={() => ''} onDeleteStudent={handleRemoveStudent} />
           )}
 
           {activeTab === 'materials' && (
             <TeacherMaterials 
               materials={teacherMaterials}
-              getBatchName={() => ''}
+              getBatchName={getBatchName}
               materialSearch={materialSearch}
               onSearchChange={(e) => setMaterialSearch(e.target.value)}
             />
@@ -183,7 +244,7 @@ const TeacherDashboard = () => {
           {activeTab === 'attendance' && (
             <TeacherAttendance 
               attendance={teacherAttendance}
-              getBatchName={() => ''}
+              getBatchName={getBatchName}
               getStudentName={() => ''}
             />
           )}
@@ -194,19 +255,24 @@ const TeacherDashboard = () => {
               <TeacherPayments
                 payments={teacherPayments}
                 getStudentName={() => ''}
-                getBatchName={() => ''}
+                getBatchName={getBatchName}
                 getPaymentStatusColor={() => ''}
                 paymentFilter={paymentFilter}
                 onFilterChange={setPaymentFilter}
                 paymentSearch={paymentSearch}
-                onSearchChange={(e) => setPaymentSearch(e.target.value)}
+                onSearchChange={(e) => setMaterialSearch(e.target.value)}
                 onAlertPending={() => {}}
               />
             </>
           )}
 
           {activeTab === 'notifications' && (
-            <TeacherNotifications notifications={teacherNotifications} getBatchName={() => ''} />
+            <TeacherNotifications 
+              notifications={teacherNotifications} 
+              getBatchName={getBatchName} 
+              batches={teacherBatches}
+              onDataRefresh={fetchData}
+            />
           )}
 
           {activeTab === 'settings' && (

@@ -106,9 +106,12 @@ const TeacherDashboardOverview = ({
             <div className="space-y-4">
               {notifications.slice(0, 3).map(notification => (
                 <div key={notification.id} className="p-3 bg-slate-50 rounded-lg">
-                  <p className="font-medium">{notification.title}</p>
+                  <div className="flex items-center justify-between">
+                    <p className="font-medium">{notification.title}</p>
+                    <Badge variant="outline">{notification.batchName}</Badge>
+                  </div>
                   <p className="text-sm text-slate-600">{notification.message}</p>
-                  <p className="text-xs text-slate-500 mt-1">{notification.date}</p>
+                  <p className="text-xs text-slate-500 mt-1">{new Date(notification.created_at).toLocaleDateString()}</p>
                 </div>
               ))}
             </div>

@@ -3,24 +3,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useToast } from '../../hooks/use-toast';
 import { uploadMaterial } from '../../lib/api';
 
-const AddMaterialDialog = ({ open, onOpenChange, onSuccess, onMaterialUploaded, batchId: propBatchId, batches = [] }) => {
+const AddMaterialDialog = ({ open, onOpenChange, onSuccess, onMaterialUploaded, batches = [] }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [title, setTitle] = useState('');
-  const [batchId, setBatchId] = useState(propBatchId || '');
+  const [selectedBatches, setSelectedBatches] = useState([]);
   const { toast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!title || !selectedFile || !batchId) {
+    if (!title || !selectedFile || selectedBatches.length === 0) {
       toast({
         title: "Error",
-        description: "Please fill all required fields",
+        description: "Please fill all required fields and select at least one batch",
         variant: "destructive"
       });
       return;
@@ -32,17 +31,19 @@ const AddMaterialDialog = ({ open, onOpenChange, onSuccess, onMaterialUploaded, 
       formData.append('file', selectedFile);
       formData.append('title', title);
 
-      await uploadMaterial(batchId, formData);
+      await Promise.all(
+        selectedBatches.map(batchId => uploadMaterial(batchId, formData))
+      );
 
       toast({
         title: "Success",
-        description: "Material uploaded successfully"
+        description: "Material uploaded successfully to selected batches"
       });
 
       // Reset form
       setTitle('');
       setSelectedFile(null);
-      setBatchId(propBatchId || '');
+      setSelectedBatches([]);
       // Call success callbacks
       if (onSuccess) onSuccess();
       if (onMaterialUploaded) onMaterialUploaded();
@@ -93,23 +94,27 @@ const AddMaterialDialog = ({ open, onOpenChange, onSuccess, onMaterialUploaded, 
             />
           </div>
 
-          {!selectedBatchId && (
-            <div>
-              <Label htmlFor="batch">Select Batch</Label>
-              <Select value={batchId} onValueChange={setBatchId} required>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a batch" />
-                </SelectTrigger>
-                <SelectContent>
-                  {batches.map((batch) => (
-                    <SelectItem key={batch.id} value={batch.id.toString()}>
-                      {batch.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div>
+            <Label>Select Batches</Label>
+            <div className="flex flex-wrap gap-2 py-2">
+              {batches.map((batch) => (
+                <Button
+                  key={batch.id}
+                  type="button"
+                  variant={selectedBatches.includes(batch.id) ? 'default' : 'outline'}
+                  onClick={() => {
+                    setSelectedBatches(prev =>
+                      prev.includes(batch.id)
+                        ? prev.filter(id => id !== batch.id)
+                        : [...prev, batch.id]
+                    );
+                  }}
+                >
+                  {batch.name}
+                </Button>
+              ))}
             </div>
-          )}
+          </div>
 
           <div>
             <Label htmlFor="file">PDF File</Label>
@@ -132,7 +137,7 @@ const AddMaterialDialog = ({ open, onOpenChange, onSuccess, onMaterialUploaded, 
             </Button>
             <Button
               type="submit"
-              disabled={isUploading || !title || !selectedFile || (!selectedBatchId && !batchId)}
+              disabled={isUploading || !title || !selectedFile || selectedBatches.length === 0}
             >
               {isUploading ? "Uploading..." : "Upload Material"}
             </Button>
