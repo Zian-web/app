@@ -41,6 +41,35 @@ export const ENDPOINTS = {
             LIST: (batchId) => `/api/batches/${batchId}/payments`
         },
     },
+    PAYMENTS: {
+        TEACHER: {
+            LIST: '/api/teacher/payments',
+            LIST_BY_BATCH: (batchId) => `/api/teacher/batches/${batchId}/payments`,
+            SUMMARY: '/api/teacher/payments/summary',
+            STUDENTS_DUE: '/api/teacher/students/due-payments',
+            BATCH_DUE: (batchId) => `/api/teacher/batch/${batchId}/due-payments`
+        },
+        STUDENT: {
+            LIST: '/api/student/payments',
+            SUMMARY: '/api/student/payments/summary',
+            BATCH_STATUS: (batchId) => `/api/student/batch/${batchId}/payment-status`,
+            DUE_PAYMENTS: (batchId) => `/api/student/batch/${batchId}/due-payments`,
+            PAYMENT_PAGE: (batchId, months) => `/api/student/batch/${batchId}/payment-page?months=${months}`,
+            PAYMENT_OPTIONS: (batchId) => `/api/student/batch/${batchId}/payment-options`
+        },
+        CASH: {
+            MARK: '/api/payments/cash',
+            MARK_ALT: (paymentId) => `/api/payments/${paymentId}/mark-cash`
+        },
+        ONLINE: {
+            INITIATE: '/api/payments/online/initiate',
+            INITIATE_MULTIPLE: '/api/payments/online/initiate-multiple'
+        },
+        REMINDERS: {
+            SEND: '/api/payments/reminders/send'
+        },
+        CREATE: '/api/payments/create'
+    },
     MATERIALS: {
         DELETE: (materialId) => `/api/materials/${materialId}`,
         PRESIGNED_URL: (materialId) => `/api/materials/${materialId}/presigned-url`

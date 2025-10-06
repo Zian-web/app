@@ -39,6 +39,7 @@ import {
   deleteMaterial,
   removeStudent
 } from '../../lib/api';
+import { api } from '../../lib/api';
 import { useToast } from '../../hooks/use-toast';
 import BatchStudents from '../teacher/BatchStudents';
 import BatchMaterials from '../teacher/BatchMaterials';
@@ -107,7 +108,8 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
                 getJoiningRequests(batch.id),
                 getNotificationsForBatch(batch.id),
                 getBatchMaterials(batch.id),
-                getPaymentsForBatch(batch.id)
+                // Use teacher payments endpoint instead of batch payments
+                userRole === 'teacher' ? api.get('/api/teacher/payments') : api.get('/api/student/payments')
             ]);
 
             const [students, requests, notifications, materials, payments] = results;
@@ -116,7 +118,12 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
             if (requests.status === 'fulfilled') setJoiningRequests(requests.value || []);
             if (notifications.status === 'fulfilled') setBatchNotifications(notifications.value || []);
             if (materials.status === 'fulfilled') setBatchMaterials(materials.value || []);
-            if (payments.status === 'fulfilled') setBatchPayments(payments.value || []);
+            if (payments.status === 'fulfilled') {
+                // Filter payments for this specific batch
+                const allPayments = payments.value || [];
+                const batchPayments = allPayments.filter(payment => payment.batch_id === batch.id);
+                setBatchPayments(batchPayments);
+            }
 
         } catch (err) {
             setError(err.message);
@@ -193,6 +200,48 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
   const handleAddPayment = (paymentData) => {
     toast({ title: "Success", description: "Payment added successfully (Demo)" });
     console.log("New Payment Data:", paymentData);
+  };
+
+  const createTestPayments = async () => {
+    try {
+      // Create test payments for this batch
+      const testPayments = [
+        {
+          student_id: batchStudents[0]?.id,
+          batch_id: batch.id,
+          amount: batch.fees || 1000,
+          months: 1,
+          due_date: new Date().toISOString(),
+          status: 'pending'
+        },
+        {
+          student_id: batchStudents[1]?.id,
+          batch_id: batch.id,
+          amount: batch.fees || 1000,
+          months: 2,
+          due_date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
+          status: 'overdue'
+        }
+      ];
+
+      for (const payment of testPayments) {
+        try {
+          await api.post('/api/payments/create', payment);
+        } catch (error) {
+          console.log('Test payment creation failed (expected if endpoint not implemented):', error);
+        }
+      }
+
+      toast({ title: "Test Payments", description: "Test payments created for this batch." });
+      
+      // Refresh payments
+      const response = userRole === 'teacher' ? await api.get('/api/teacher/payments') : await api.get('/api/student/payments');
+      const allPayments = response.data || [];
+      const batchPayments = allPayments.filter(payment => payment.batch_id === batch.id);
+      setBatchPayments(batchPayments);
+    } catch (error) {
+      console.error('Error creating test payments:', error);
+    }
   };
 
   const handleApproveRequest = async (reqId) => {
@@ -451,6 +500,7 @@ const BatchDetails = ({ batch, onBack, userRole, currentUser }) => {
             onFilterChange={setPaymentFilter}
             paymentSearch={paymentSearch}
             onSearchChange={(e) => setPaymentSearch(e.target.value)}
+            batchId={batch.id}
           />
           {userRole === 'teacher' && (
           <Dialog open={showUpdatePayment} onOpenChange={setShowUpdatePayment}>
