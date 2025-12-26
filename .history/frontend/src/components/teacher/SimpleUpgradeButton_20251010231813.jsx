@@ -493,7 +493,7 @@ const SimpleUpgradeButton = () => {
             </Button>
             <Button 
               onClick={handleUpgrade}
-              disabled={isLoading || !formData.bankAccountNumber || !formData.ifscCode || !formData.accountHolderName || !formData.email || !formData.phoneNumber || formData.phoneNumber.length !== 13 || !formData.panNumber || formData.panNumber.length !== 10 || !formData.street || !formData.city || !formData.state || !formData.postalCode}
+              disabled={isLoading || !formData.bankAccountNumber || !formData.ifscCode || !formData.accountHolderName || !formData.email || !formData.phoneNumber || formData.phoneNumber.length !== 13 || !formData.street || !formData.city || !formData.state || !formData.postalCode}
               className="bg-blue-600 hover:bg-blue-700"
             >
               <CreditCard className="w-4 h-4 mr-2" />

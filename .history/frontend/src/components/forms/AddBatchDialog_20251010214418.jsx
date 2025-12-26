@@ -407,11 +407,7 @@ const AddBatchDialog = ({ open, onOpenChange, onAddBatch }) => {
                 type="number" 
                 id="student_limit" 
                 value={batchData.student_limit} 
-                onChange={(e) => {
-                  const value = parseInt(e.target.value) || 0;
-                  console.log('Student limit input changed:', e.target.value, 'parsed:', value);
-                  setBatchData({...batchData, student_limit: value});
-                }} 
+                onChange={(e) => setBatchData({...batchData, student_limit: parseInt(e.target.value) || 0})} 
                 min="1"
                 max="100"
               />

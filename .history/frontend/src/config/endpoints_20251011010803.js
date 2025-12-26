@@ -116,9 +116,6 @@ export const ENDPOINTS = {
         UPLOAD: '/api/teacher/kyc-upload',
         STATUS: '/api/teacher/kyc-status',
         ACCOUNT_STATUS: '/api/teacher/account-status'
-    },
-    STORAGE: {
-        DETAILS: '/api/teacher/storage-details'
     }
 };
 

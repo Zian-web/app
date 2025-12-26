@@ -112,10 +112,10 @@ const SimpleUpgradeButton = () => {
 
   const handleUpgrade = async () => {
     // Validate required fields
-    if (!formData.bankAccountNumber || !formData.ifscCode || !formData.accountHolderName || !formData.email || !formData.phoneNumber || !formData.panNumber || !formData.street || !formData.city || !formData.state || !formData.postalCode) {
+    if (!formData.bankAccountNumber || !formData.ifscCode || !formData.accountHolderName || !formData.email || !formData.phoneNumber || !formData.street || !formData.city || !formData.state || !formData.postalCode) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields: Bank Account Number, IFSC Code, Account Holder Name, Email, Phone Number, PAN Number, and Address details",
+        description: "Please fill in all required fields: Bank Account Number, IFSC Code, Account Holder Name, Email, Phone Number, and Address details",
         variant: "destructive"
       });
       return;
@@ -126,17 +126,6 @@ const SimpleUpgradeButton = () => {
       toast({
         title: "Error",
         description: "Please enter a valid Indian phone number (10 digits after +91)",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Validate PAN number format
-    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-    if (!panRegex.test(formData.panNumber)) {
-      toast({
-        title: "Error",
-        description: "Please enter a valid PAN number (e.g., ABCDE1234F)",
         variant: "destructive"
       });
       return;
@@ -173,7 +162,6 @@ const SimpleUpgradeButton = () => {
         phone_number: formData.phoneNumber,
         bank_account_number: formData.bankAccountNumber,
         ifsc_code: formData.ifscCode,
-        pan_number: formData.panNumber, // NEW: PAN number for KYC
         bank_name: formData.bankName,
         account_type: formData.accountType,
         full_address: formData.street,
@@ -388,25 +376,6 @@ const SimpleUpgradeButton = () => {
             <p className="text-xs text-gray-500 mt-1">Enter your 10-digit mobile number (e.g., 9876543210)</p>
           </div>
 
-          <div>
-            <Label htmlFor="panNumber" className="text-sm font-medium">
-              PAN Number * (Required for KYC)
-            </Label>
-            <Input
-              id="panNumber"
-              type="text"
-              value={formData.panNumber}
-              onChange={(e) => {
-                // Convert to uppercase and limit to 10 characters
-                const value = e.target.value.toUpperCase().slice(0, 10);
-                handleInputChange('panNumber', value);
-              }}
-              placeholder="ABCDE1234F"
-              className="mt-1"
-            />
-            <p className="text-xs text-gray-500 mt-1">Enter your 10-character PAN number (e.g., ABCDE1234F)</p>
-          </div>
-
           {/* Address Section */}
           <div className="border-t pt-4">
             <h4 className="text-sm font-medium text-gray-800 mb-3">Address Details *</h4>
@@ -493,7 +462,7 @@ const SimpleUpgradeButton = () => {
             </Button>
             <Button 
               onClick={handleUpgrade}
-              disabled={isLoading || !formData.bankAccountNumber || !formData.ifscCode || !formData.accountHolderName || !formData.email || !formData.phoneNumber || formData.phoneNumber.length !== 13 || !formData.panNumber || formData.panNumber.length !== 10 || !formData.street || !formData.city || !formData.state || !formData.postalCode}
+              disabled={isLoading || !formData.bankAccountNumber || !formData.ifscCode || !formData.accountHolderName || !formData.email || !formData.phoneNumber || formData.phoneNumber.length !== 13 || !formData.street || !formData.city || !formData.state || !formData.postalCode}
               className="bg-blue-600 hover:bg-blue-700"
             >
               <CreditCard className="w-4 h-4 mr-2" />

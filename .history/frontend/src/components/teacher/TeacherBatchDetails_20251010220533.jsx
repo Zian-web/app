@@ -181,7 +181,6 @@ const TeacherBatchDetails = ({ batch, onBack, currentUser }) => {
         title: "Success",
         description: "Join request rejected",
       });
-      fetchData(); // Refresh data
     } catch (error) {
       console.error('Error rejecting request:', error);
       toast({
@@ -281,7 +280,6 @@ const TeacherBatchDetails = ({ batch, onBack, currentUser }) => {
         title: "Success",
         description: "Student removed from batch",
       });
-      fetchData(); // Refresh data
     } catch (error) {
       console.error('Error removing student:', error);
       toast({
@@ -300,7 +298,6 @@ const TeacherBatchDetails = ({ batch, onBack, currentUser }) => {
         title: "Success",
         description: "Material deleted successfully",
       });
-      fetchData(); // Refresh data
     } catch (error) {
       console.error('Error deleting material:', error);
       toast({
@@ -424,16 +421,6 @@ const TeacherBatchDetails = ({ batch, onBack, currentUser }) => {
                 <p className="text-xs text-muted-foreground">
                   {joiningRequests.length} pending requests
                 </p>
-                {joiningRequests.length > 0 && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="mt-2"
-                    onClick={() => setActiveTab('pending')}
-                  >
-                    Review Requests
-                  </Button>
-                )}
               </CardContent>
             </Card>
 
@@ -486,27 +473,6 @@ const TeacherBatchDetails = ({ batch, onBack, currentUser }) => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        {/* Pending Requests Tab */}
-        <TabsContent value="pending" className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="text-lg font-semibold">Pending Join Requests</h3>
-              <p className="text-sm text-muted-foreground">
-                {joiningRequests.length} student{joiningRequests.length !== 1 ? 's' : ''} waiting for approval
-              </p>
-            </div>
-            <Badge variant="outline" className="text-sm">
-              {joiningRequests.length} pending
-            </Badge>
-          </div>
-          
-          <BatchJoiningRequests 
-            requests={joiningRequests}
-            onApprove={handleApproveRequest}
-            onReject={handleRejectRequest}
-          />
         </TabsContent>
 
         {/* Students Tab */}

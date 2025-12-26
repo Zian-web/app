@@ -388,25 +388,6 @@ const SimpleUpgradeButton = () => {
             <p className="text-xs text-gray-500 mt-1">Enter your 10-digit mobile number (e.g., 9876543210)</p>
           </div>
 
-          <div>
-            <Label htmlFor="panNumber" className="text-sm font-medium">
-              PAN Number * (Required for KYC)
-            </Label>
-            <Input
-              id="panNumber"
-              type="text"
-              value={formData.panNumber}
-              onChange={(e) => {
-                // Convert to uppercase and limit to 10 characters
-                const value = e.target.value.toUpperCase().slice(0, 10);
-                handleInputChange('panNumber', value);
-              }}
-              placeholder="ABCDE1234F"
-              className="mt-1"
-            />
-            <p className="text-xs text-gray-500 mt-1">Enter your 10-character PAN number (e.g., ABCDE1234F)</p>
-          </div>
-
           {/* Address Section */}
           <div className="border-t pt-4">
             <h4 className="text-sm font-medium text-gray-800 mb-3">Address Details *</h4>
@@ -493,7 +474,7 @@ const SimpleUpgradeButton = () => {
             </Button>
             <Button 
               onClick={handleUpgrade}
-              disabled={isLoading || !formData.bankAccountNumber || !formData.ifscCode || !formData.accountHolderName || !formData.email || !formData.phoneNumber || formData.phoneNumber.length !== 13 || !formData.panNumber || formData.panNumber.length !== 10 || !formData.street || !formData.city || !formData.state || !formData.postalCode}
+              disabled={isLoading || !formData.bankAccountNumber || !formData.ifscCode || !formData.accountHolderName || !formData.email || !formData.phoneNumber || formData.phoneNumber.length !== 13 || !formData.street || !formData.city || !formData.state || !formData.postalCode}
               className="bg-blue-600 hover:bg-blue-700"
             >
               <CreditCard className="w-4 h-4 mr-2" />

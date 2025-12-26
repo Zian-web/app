@@ -27,7 +27,7 @@ const SubscriptionCalculationDemo = () => {
 
     try {
       setIsLoading(true);
-      const response = await api.get(`/api/subscription/calculate/${batchId}`);
+      const response = await api.get(`/api/subscription/calculate-batch/${batchId}`);
       setCalculationResult(response);
       
       toast({
@@ -159,7 +159,7 @@ const SubscriptionCalculationDemo = () => {
                           <p><span className="font-medium">Batch Name:</span> {calculationResult.batch_name}</p>
                           <p><span className="font-medium">Batch Fees:</span> ₹{calculationResult.batch_fees}</p>
                           <p><span className="font-medium">Student Limit:</span> {calculationResult.student_limit}</p>
-                          <p><span className="font-medium">Current Students:</span> {calculationResult.current_student_count}</p>
+                          <p><span className="font-medium">Current Students:</span> {calculationResult.current_students}</p>
                         </div>
                       </div>
                       

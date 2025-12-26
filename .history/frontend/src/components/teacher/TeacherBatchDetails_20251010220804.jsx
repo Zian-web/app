@@ -281,7 +281,6 @@ const TeacherBatchDetails = ({ batch, onBack, currentUser }) => {
         title: "Success",
         description: "Student removed from batch",
       });
-      fetchData(); // Refresh data
     } catch (error) {
       console.error('Error removing student:', error);
       toast({
@@ -300,7 +299,6 @@ const TeacherBatchDetails = ({ batch, onBack, currentUser }) => {
         title: "Success",
         description: "Material deleted successfully",
       });
-      fetchData(); // Refresh data
     } catch (error) {
       console.error('Error deleting material:', error);
       toast({

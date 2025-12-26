@@ -220,15 +220,13 @@ const AddBatchDialog = ({ open, onOpenChange, onAddBatch }) => {
       
       // Calculate expected subscription fee for debugging
       const expectedSubscriptionFee = Math.max(
-        mappedData.student_limit * 35, // ₹35 per student minimum
+        mappedData.max_students * 35, // ₹35 per student minimum
         mappedData.fees * 0.07 // 7% of batch fees
       );
       
       console.log('Creating batch with payment-first flow:', mappedData);
-      console.log('Validation - Fees:', mappedData.fees, 'Student Limit:', mappedData.student_limit);
+      console.log('Validation - Fees:', mappedData.fees, 'Max Students:', mappedData.max_students);
       console.log('Expected subscription fee:', expectedSubscriptionFee);
-      console.log('Frontend batchData.student_limit:', batchData.student_limit);
-      console.log('Parsed student_limit:', parseInt(batchData.student_limit));
       
       // Call the new payment-first API endpoint
       const response = await api.post('/api/teacher/batch/create-with-payment', mappedData);
@@ -407,11 +405,7 @@ const AddBatchDialog = ({ open, onOpenChange, onAddBatch }) => {
                 type="number" 
                 id="student_limit" 
                 value={batchData.student_limit} 
-                onChange={(e) => {
-                  const value = parseInt(e.target.value) || 0;
-                  console.log('Student limit input changed:', e.target.value, 'parsed:', value);
-                  setBatchData({...batchData, student_limit: value});
-                }} 
+                onChange={(e) => setBatchData({...batchData, student_limit: parseInt(e.target.value)})} 
                 min="1"
                 max="100"
               />

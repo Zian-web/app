@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Eye, Loader2 } from "lucide-react";
 import PdfViewerDialog from "../common/PdfViewerDialog";
-import { getStudentBatches, getBatchMaterials } from "../../lib/api";
+import { getStudentBatches, getBatchMaterials, getMaterialPresignedUrl } from "../../lib/api";
 import { useToast } from "../../hooks/use-toast";
 
 const StudentMaterials = () => {

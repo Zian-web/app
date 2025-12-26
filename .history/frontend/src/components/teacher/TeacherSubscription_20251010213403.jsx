@@ -225,21 +225,11 @@ const TeacherSubscription = () => {
       console.log('Processing subscription payment:', { subscriptionId, months });
       
       // Use direct fetch to avoid API client issues
-      const token = localStorage.getItem('authToken'); // Fixed: use 'authToken' instead of 'token'
+      const token = localStorage.getItem('token');
       const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
       const url = `${API_BASE_URL}/api/teacher/subscription/payment?subscription_id=${subscriptionId}&months=${months}`;
       
       console.log('Payment URL:', url);
-      console.log('Auth token:', token ? 'Present' : 'Missing');
-      
-      if (!token) {
-        toast({
-          title: "Authentication Required",
-          description: "Please log in to make payments",
-          variant: "destructive"
-        });
-        return;
-      }
       
       const response = await fetch(url, {
         method: 'POST',
